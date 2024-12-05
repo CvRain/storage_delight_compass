@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
+    const QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
     QObject::connect(
@@ -12,7 +12,8 @@ int main(int argc, char *argv[])
         &app,
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
-    engine.loadFromModule("storage_delight_compass", "Main");
 
-    return app.exec();
+    engine.load("qrc:/qt/qml/storage_delight_compass/src/Main.qml");
+
+    return QGuiApplication::exec();
 }
