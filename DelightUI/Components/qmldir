@@ -1,0 +1,4 @@
+module Components
+prefer :/qt/qml/storage_delight_compass/DelightUI/Components/
+
+Card 1.0 Card.qml

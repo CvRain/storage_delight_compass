@@ -1,0 +1,4 @@
+module DelightUI
+prefer :/qt/qml/storage_delight_compass/DelightUI/
+
+App 1.0 App.qml

@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
 
-    engine.load("qrc:/qt/qml/storage_delight_compass/src/Main.qml");
+    engine.load("qrc:/qt/qml/storage_delight_compass/DelightUI/App.qml");
 
     return QGuiApplication::exec();
 }

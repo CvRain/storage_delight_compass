@@ -1,0 +1,6 @@
+module Pages
+prefer :/qt/qml/storage_delight_compass/DelightUI/Pages/
+
+Welcome     1.0 Welcome.qml
+Terminal    1.0 Terminal.qml
+Login       1.0 Login.qml

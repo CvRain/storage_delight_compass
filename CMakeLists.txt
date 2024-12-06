@@ -16,18 +16,24 @@ qt_add_executable(appstorage_delight_compass
         src/main.cpp
 )
 
-set(BASE_QML_PATH src/Qml)
-set(PAGE_QML_PATH src/Qml/Pages)
+set(PAGE_QML_PATH DelightUI/Pages)
+set(COMPONENT_QML_PATH DelightUI/Components)
+
 set(QML_PAGES ${PAGE_QML_PATH}/Login.qml
         ${PAGE_QML_PATH}/Register.qml
         ${PAGE_QML_PATH}/Welcome.qml
         ${PAGE_QML_PATH}/Terminal.qml)
 
+set(QML_COMPONENTS ${COMPONENT_QML_PATH}/Card.qml)
+
+set(QML_RESOURCES DelightUI/Components/qmldir DelightUI/Pages/qmldir DelightUI/qmldir)
+
 qt_add_qml_module(appstorage_delight_compass
         URI storage_delight_compass
         VERSION 1.0
         QML_FILES
-        src/Main.qml ${QML_PAGES}
+        DelightUI/App.qml ${QML_PAGES} ${QML_COMPONENTS}
+        RESOURCES ${QML_RESOURCES}
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
