@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/img/icon_dark.png</file>
+        <file>res/img/icon_light.png</file>
+        <file>res/img/storage_delight_placeholder.png</file>
+    </qresource>
+</RCC>

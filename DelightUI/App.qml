@@ -14,7 +14,6 @@ ApplicationWindow {
     Component.onCompleted:{
         console.log(mainWindow.width)
     }
-
     StackView{
         id: stackView
         anchors.fill: parent
