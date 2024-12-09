@@ -1,9 +1,15 @@
 import QtQuick
 import QtQuick.Controls
+import Storage.Service
+import Storage.User
+import Storage.Model
 
 pragma ComponentBehavior: Bound
 
 Rectangle {
+    signal shouldClosePage(bool isShould)
+    signal pageChange()
+
     id: root
     width: 1920
     height: 1080
@@ -21,8 +27,20 @@ Rectangle {
         Login {
             id: loginLoader
             anchors.centerIn: parent
-            onRegisterClicked: {
-                stackView.replace(registerPage)
+
+            Connections {
+                target: loginLoader
+
+                function onLoginClicked(name, password, isAdmin) {
+                    console.debug("[debug] user: ", name)
+                    console.debug("[debug] password: ", password)
+                    console.debug('[debug] admin', isAdmin)
+                    HttpClient.login(name, password)
+                }
+
+                function onRegisterClicked() {
+                    stackView.replace(registerPage)
+                }
             }
         }
     }
@@ -32,8 +50,18 @@ Rectangle {
         Register {
             id: registerLoader
             anchors.centerIn: parent
-            onLoginPageJump: {
-                stackView.replace(loginPage)
+
+            Connections {
+                target: registerLoader
+
+                function onLoginPageJump(){
+                    stackView.replace(loginPage)
+                }
+
+                function onRegisterClicked(name, password){
+                    console.debug("[debug] user: ", name)
+                    console.debug("[debug] password: ", password)
+                }
             }
         }
     }

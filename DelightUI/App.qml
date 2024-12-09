@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
+import "./Pages"
 
 pragma ComponentBehavior: Bound
 
@@ -14,6 +15,7 @@ ApplicationWindow {
     Component.onCompleted:{
         console.log(mainWindow.width)
     }
+
     StackView{
         id: stackView
         anchors.fill: parent
@@ -22,26 +24,40 @@ ApplicationWindow {
 
     Component{
         id: welcomePage
-        Loader{
+        Welcome{
             id: welcomePageLoader
-            source:"./Pages/Welcome.qml"
-            Connections{
-                target: welcomePageLoader.item
-                function onPageChange(){
+            width: mainWindow.width
+            height: mainWindow.height
+            anchors.fill: parent
+            onPageChange:{
+                stackView.replace(terminalPage)
+            }
+
+            Button{
+                id: textButton
+                width: 40
+                height: 80
+                text: "text jump"
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+
+                onClicked:{
                     stackView.replace(terminalPage)
                 }
             }
         }
     }
 
-
     Component{
         id: terminalPage
-        Loader{
+        Terminal{
             id: terminalPageLoader
-            source:"./Pages/Terminal.qml"
+            width: mainWindow.width
+            height: mainWindow.height
+            anchors.fill: parent
+
             Connections{
-                target: terminalPageLoader.item
+                target: terminalPageLoader
                 function onPageChange(){
                     stackView.replace(welcomePage)
                 }

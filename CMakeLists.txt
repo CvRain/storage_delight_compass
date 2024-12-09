@@ -8,12 +8,23 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+    add_definitions(-DWEBSOCKETPP_NO_CPP11)
+endif()
+
 find_package(Qt6 6.5 REQUIRED COMPONENTS Quick)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
+set(CPP_SRC src/main.cpp
+        src/http_clint.cpp
+        src/http_clint.hpp
+        src/types/result.hpp
+        src/user_info.cpp
+        src/user_info.hpp)
+
 qt_add_executable(appstorage_delight_compass
-        src/main.cpp
+        ${CPP_SRC}
 )
 
 set(PAGE_QML_PATH DelightUI/Pages)
@@ -25,9 +36,10 @@ set(QML_PAGES ${PAGE_QML_PATH}/Login.qml
         ${PAGE_QML_PATH}/Terminal.qml)
 
 set(QML_COMPONENTS
-    ${COMPONENT_QML_PATH}/Card.qml
-    ${COMPONENT_QML_PATH}/InputBar.qml
-    ${COMPONENT_QML_PATH}/BaseButton.qml)
+        ${COMPONENT_QML_PATH}/Card.qml
+        ${COMPONENT_QML_PATH}/InputBar.qml
+        ${COMPONENT_QML_PATH}/BaseButton.qml
+        DelightUI/Components/FlatSwitch.qml)
 
 set(QML_RESOURCES DelightUI/Components/qmldir DelightUI/Pages/qmldir DelightUI/qmldir)
 
@@ -52,7 +64,8 @@ set_target_properties(appstorage_delight_compass PROPERTIES
 )
 
 target_link_libraries(appstorage_delight_compass
-        PRIVATE Qt6::Quick
+        PRIVATE Qt6::Quick Qt6::Network
+
 )
 
 include(GNUInstallDirs)

@@ -7,7 +7,7 @@ Card {
     id: root
     height: 500
 
-    signal loginClicked(string name, string password)
+    signal loginClicked(string name, string password, bool isAdmin)
     signal registerClicked()
 
     Image {
@@ -67,14 +67,48 @@ Card {
         }
     }
 
-    Switch{
+    FlatSwitch{
         id: switchRole
-        width: 10
-        height: 10
+        width: 40
+        height: 40
+        indicatorWidth: 40
+        indicatorHeight: 20
 
         anchors.top: formLayout.bottom
-        anchors.topMargin: 35
+        anchors.topMargin: 25
         anchors.left: formLayout.left
+
+        Connections{
+            target: switchRole
+
+            function onCheckedChanged(){
+                if(switchRole.checked === true){
+                    switchRoleTip.color = switchRoleTip.activeColor
+                    switchRoleTip.text = switchRoleTip.adminUser
+                }else{
+                    switchRoleTip.color = switchRoleTip.unactiveColor
+                    switchRoleTip.text = switchRoleTip.commonUser
+                }
+            }
+        }
+    }
+
+    Text{
+        property string commonUser: qsTr("I am user")
+        property string adminUser: qsTr("I am admin")
+        property color unactiveColor: "#4c4f69"
+        property color activeColor: "#dc8a78"
+
+        id: switchRoleTip
+        height: switchRole.height
+        text: commonUser
+        font.pixelSize: 14
+        color: unactiveColor
+        horizontalAlignment: Text.AlignLeft
+
+        anchors.left: switchRole.right
+        anchors.leftMargin: 7
+        anchors.verticalCenter: switchRole.verticalCenter
     }
 
     Text{
@@ -87,8 +121,8 @@ Card {
         verticalAlignment: Text.AlignLeft
         font.pointSize: 10
 
-        anchors.top: switchRole.bottom
-        anchors.topMargin: 10
+        anchors.top: formLayout.bottom
+        anchors.topMargin: 25
         anchors.right: root.right
 
         MouseArea{
@@ -119,10 +153,9 @@ Card {
         anchors.horizontalCenter: parent.horizontalCenter
 
         onClicked:{
-            root.loginClicked(userNameInput.text, userPasswordInput.text)
-            console.debug("[debug] user: ", userNameInput.text)
-            console.debug("[debug] password: ", userPasswordInput.text)
+            root.loginClicked(userNameInput.text, userPasswordInput.text, switchRole.checked)
         }
     }
+
 
 }
