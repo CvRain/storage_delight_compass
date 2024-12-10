@@ -1,8 +1,8 @@
 import QtQuick
 import QtQuick.Controls
-import Storage.Service
-import Storage.User
+import Storage.Service 1.0
 import Storage.Model
+import Storage.User
 
 pragma ComponentBehavior: Bound
 
@@ -32,10 +32,10 @@ Rectangle {
                 target: loginLoader
 
                 function onLoginClicked(name, password, isAdmin) {
-                    console.debug("[debug] user: ", name)
-                    console.debug("[debug] password: ", password)
-                    console.debug('[debug] admin', isAdmin)
-                    HttpClient.login(name, password)
+                    var result = HttpClient.login(name, password)
+                    console.log("code: ", result.code)
+                    console.log("message: ", result.message)
+                    console.log("result: ",result.result)
                 }
 
                 function onRegisterClicked() {

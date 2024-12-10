@@ -4,25 +4,28 @@
 
 #ifndef HTTP_CLINT_HPP
 #define HTTP_CLINT_HPP
-#define _TURN_OFF_PLATFORM_STRING
 
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QObject>
+
+#include "types/result.hpp"
 
 /**
  * @brief singleton http clint
  */
-class HttpClint final : public QObject {
+class HttpClient final : public QObject {
     Q_OBJECT
 public:
-    static HttpClint* getInstance();
+    static HttpClient* getInstance();
 
-    ~HttpClint() override;
+    ~HttpClient() override;
 
-    Q_INVOKABLE void login(const QString &userName, const QString &password);
-
+    Q_INVOKABLE BaseResult login(const QString &userName, const QString &password);
+protected:
+    static void replyHandler(const QNetworkReply* reply);
 private:
-    explicit HttpClint();
+    explicit HttpClient();
 
     const QString baseUrl;
     QNetworkAccessManager *manager;

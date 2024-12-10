@@ -12,21 +12,21 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
-HttpClint* HttpClint::getInstance() {
+HttpClient* HttpClient::getInstance() {
     qDebug() << "HttpClient::getInstance";
 
-    static HttpClint instance;
+    static HttpClient instance;
     return &instance;
 }
 
-HttpClint::~HttpClint() {
+HttpClient::~HttpClient() {
     qDebug() << "HttpClient::~HttpClient";
     if (manager != nullptr) {
         manager->deleteLater();
     }
 }
 
-void HttpClint::login(const QString &userName, const QString &password) {
+BaseResult HttpClient::login(const QString &userName, const QString &password) {
     qDebug() << "HttpClient::login";
 
     const auto url = QUrl{baseUrl + "/user/login"};
@@ -38,26 +38,42 @@ void HttpClint::login(const QString &userName, const QString &password) {
     json.insert("password", password);
 
     const auto jsonData = QJsonDocument{json}.toJson();
-    manager->post(request, jsonData);
+    const auto reply = manager->post(request, jsonData);
+    if (reply->error() != QNetworkReply::NoError) {
+        BaseResult result;
+        result.setResult(-1, "error", reply->errorString());
+        return result;
+    }
+    const auto& jsonResponse = QJsonDocument::fromJson(reply->readAll());
+
+    const auto code = jsonResponse.object()["code"].toInt();
+    const auto& message = jsonResponse.object()["message"].toString();
+    const auto& result = jsonResponse.object()["result"].toString();
+
+    reply->deleteLater();
+    BaseResult back;
+    back.setResult(code, result, message);
+    return back;
 }
 
-HttpClint::HttpClint()
+void HttpClient::replyHandler(const QNetworkReply *reply) {
+    if (reply->error() == QNetworkReply::NoError) {
+        qDebug() << "[success] Request " << reply->url();
+        return;
+    }
+    qDebug() << "[failed] Request " << reply->url() << ": " << reply->error();
+}
+
+HttpClient::HttpClient()
     : baseUrl("http://localhost:10492/api"), manager(new QNetworkAccessManager(this)) {
     qDebug() << "HttpClient::HttpClient";
 
-    const auto isConnected = connect(manager, &QNetworkAccessManager::finished, this, [](QNetworkReply *reply) {
-        if (reply->error() != QNetworkReply::NoError) {
-            qDebug() << "error: " << reply->errorString();
-        }
-        const auto response = reply->readAll();
-        const auto jsonResponse = QJsonDocument::fromJson(response);
-        qDebug() << "response: " << jsonResponse.toJson();
-    });
-
-    if (!isConnected) {
-        qDebug() << "connect failed";
-    }
-
     const auto request = QNetworkRequest(QUrl{baseUrl + "/hello/say"});
-    manager->get(request);
+    const auto reply = manager->get(request);
+    if (reply->error() != QNetworkReply::NoError) {
+        qDebug() << "HttpClient::HttpClient: " << reply->errorString();
+    }else {
+        qDebug() << "HttpClient::HttpClient: " << reply->readAll();
+    }
+    reply->deleteLater();
 }

@@ -17,15 +17,28 @@ public:
     explicit BaseResult(QObject *parent = nullptr) : QObject(parent) {
     }
 
-    int getCode() const {
+    BaseResult(const BaseResult &other) : QObject(other.parent()) {
+        code = other.code;
+        result = other.result;
+        message = other.message;
+    }
+
+    BaseResult &operator=(const BaseResult &other) {
+        code = other.code;
+        result = other.result;
+        message = other.message;
+        return *this;
+    }
+
+    [[nodiscard]] int getCode() const {
         return code;
     }
 
-    QString getResult() const {
+    [[nodiscard]] QString getResult() const {
         return result;
     }
 
-    QString getMessage() const {
+    [[nodiscard]] QString getMessage() const {
         return message;
     }
 

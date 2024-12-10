@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
 
-    qmlRegisterSingletonInstance<HttpClint>("Storage.Service", 1, 0, "HttpClient", HttpClint::getInstance());
+    qmlRegisterSingletonInstance<HttpClient>("Storage.Service", 1, 0, "HttpClient", HttpClient::getInstance());
     qmlRegisterSingletonInstance<UserInfo>("Storage.User", 1, 0, "UserInfo", UserInfo::getInstance());
     qmlRegisterType<BaseResult>("Storage.Model", 1, 0, "BaseResult");
 
