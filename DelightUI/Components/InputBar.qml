@@ -39,4 +39,9 @@ Rectangle{
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
     }
+
+    function isEmpty(){
+        return textInput.text === undefined || textInput.text === null || textInput.text === ''
+    }
 }
+

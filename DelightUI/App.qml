@@ -32,19 +32,6 @@ ApplicationWindow {
             onPageChange:{
                 stackView.replace(terminalPage)
             }
-
-            Button{
-                id: textButton
-                width: 40
-                height: 80
-                text: "text jump"
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-
-                onClicked:{
-                    stackView.replace(terminalPage)
-                }
-            }
         }
     }
 

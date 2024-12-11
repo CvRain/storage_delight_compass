@@ -8,6 +8,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QObject>
+#include <QJsonObject>
 
 #include "types/result.hpp"
 
@@ -16,14 +17,24 @@
  */
 class HttpClient final : public QObject {
     Q_OBJECT
+
 public:
     static HttpClient* getInstance();
 
     ~HttpClient() override;
 
-    Q_INVOKABLE BaseResult login(const QString &userName, const QString &password);
+    Q_INVOKABLE void login(const QString &userName, const QString &password);
+    Q_INVOKABLE void userRegister(const QString& userName, const QString &password, int role);
+
+signals:
+    void requestFailed(const QString &error);
+    void userLogged(int code, const QString &result, const QString &message);
+    void userRegistered(int code, const QString &result, const QString &message);
+
 protected:
-    static void replyHandler(const QNetworkReply* reply);
+    void userLoginResponse(QNetworkReply *reply);
+    void userRegisterResponse(QNetworkReply *reply);
+
 private:
     explicit HttpClient();
 

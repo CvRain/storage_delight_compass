@@ -26,42 +26,73 @@ HttpClient::~HttpClient() {
     }
 }
 
-BaseResult HttpClient::login(const QString &userName, const QString &password) {
+void HttpClient::login(const QString &userName, const QString &password) {
     qDebug() << "HttpClient::login";
 
-    const auto url = QUrl{baseUrl + "/user/login"};
-    QNetworkRequest request{url};
+    const auto data = QJsonObject{
+        {"name", userName},
+        {"password", password}
+    };
+
+    QNetworkRequest request(QUrl{baseUrl + "/user/login"});
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    QJsonObject json;
-    json.insert("name", userName);
-    json.insert("password", password);
-
-    const auto jsonData = QJsonDocument{json}.toJson();
-    const auto reply = manager->post(request, jsonData);
-    if (reply->error() != QNetworkReply::NoError) {
-        BaseResult result;
-        result.setResult(-1, "error", reply->errorString());
-        return result;
-    }
-    const auto& jsonResponse = QJsonDocument::fromJson(reply->readAll());
-
-    const auto code = jsonResponse.object()["code"].toInt();
-    const auto& message = jsonResponse.object()["message"].toString();
-    const auto& result = jsonResponse.object()["result"].toString();
-
-    reply->deleteLater();
-    BaseResult back;
-    back.setResult(code, result, message);
-    return back;
+    QNetworkReply *reply = manager->post(request, QJsonDocument(data).toJson());
+    connect(reply, &QNetworkReply::finished, this, [this,reply]() {
+        userLoginResponse(reply);
+    });
 }
 
-void HttpClient::replyHandler(const QNetworkReply *reply) {
+void HttpClient::userRegister(const QString &userName, const QString &password, int role) {
+    qDebug() << "HttpClient::userRegister";
+    const auto data = QJsonObject{
+        {"name", userName},
+        {"password", password},
+        {"role", role}
+    };
+    QNetworkRequest request(QUrl{baseUrl + "/user/add"});
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    QNetworkReply *reply = manager->post(request, QJsonDocument(data).toJson());
+    connect(reply, &QNetworkReply::finished, this, [this,reply]() {
+        userRegisterResponse(reply);
+    });
+}
+
+void HttpClient::userLoginResponse(QNetworkReply *reply) {
+    qDebug() << "HttpClient::userLoginResponse";
     if (reply->error() == QNetworkReply::NoError) {
-        qDebug() << "[success] Request " << reply->url();
-        return;
+        const auto response = reply->readAll();
+        const auto json = QJsonDocument::fromJson(response);
+
+        const auto code = json["code"].toInt();
+        const auto &message = json["message"].toString();
+        const auto &result = json["result"].toString();
+
+        emit userLogged(code, result, message);
     }
-    qDebug() << "[failed] Request " << reply->url() << ": " << reply->error();
+    else {
+        qDebug() << "HttpClient::userLoginResponse: " << reply->errorString();
+        emit requestFailed(reply->errorString());
+    }
+    reply->deleteLater();
+}
+
+void HttpClient::userRegisterResponse(QNetworkReply *reply) {
+    qDebug() << "HttpClient::userRegisterResponse";
+    if (reply->error() == QNetworkReply::NoError) {
+        const auto response = reply->readAll();
+        const auto json = QJsonDocument::fromJson(response);
+
+        const auto code = json["code"].toInt();
+        const auto &message = json["message"].toString();
+        const auto &result = json["result"].toString();
+
+        emit userRegistered(code, result, message);
+    }
+    else {
+        qDebug() << "HttpClient::userRegisterResponse: " << reply->errorString();
+        emit requestFailed(reply->errorString());
+    }
 }
 
 HttpClient::HttpClient()
@@ -69,11 +100,4 @@ HttpClient::HttpClient()
     qDebug() << "HttpClient::HttpClient";
 
     const auto request = QNetworkRequest(QUrl{baseUrl + "/hello/say"});
-    const auto reply = manager->get(request);
-    if (reply->error() != QNetworkReply::NoError) {
-        qDebug() << "HttpClient::HttpClient: " << reply->errorString();
-    }else {
-        qDebug() << "HttpClient::HttpClient: " << reply->readAll();
-    }
-    reply->deleteLater();
 }

@@ -112,4 +112,12 @@ Card {
         }
     }
 
+    function isNameInputEmpty(){
+        return userNameInput.isEmpty()
+    }
+
+    function isPasswordInputEmpty(){
+        return userPasswordInput.isEmpty()
+    }
+
 }

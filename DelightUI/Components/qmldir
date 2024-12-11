@@ -5,3 +5,4 @@ Card 1.0 Card.qml
 InputBar 1.0 InputBar.qml
 BaseButton 1.0 BaseButton.qml
 FlatSwitch  1.0 FlatSwitch.qml
+Alert   1.0 Alert.qml

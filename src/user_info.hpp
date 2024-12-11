@@ -7,12 +7,13 @@
 
 #include <QObject>
 
+#include "types/result.hpp"
+
 class UserInfo final : public QObject {
     Q_OBJECT
 
 public:
     static UserInfo* getInstance();
-
 private:
     UserInfo();
 

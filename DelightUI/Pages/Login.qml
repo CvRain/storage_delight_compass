@@ -157,5 +157,12 @@ Card {
         }
     }
 
+    function isUserNameInputEmpty(){
+        return userNameInput.isEmpty()
+    }
 
+
+    function isUserPasswordInputEmpty(){
+        return userPasswordInput.isEmpty()
+    }
 }
