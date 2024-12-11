@@ -15,14 +15,15 @@
 HttpClient* HttpClient::getInstance() {
     qDebug() << "HttpClient::getInstance";
 
-    static HttpClient instance;
-    return &instance;
+    static HttpClient* instance;
+    return instance;
 }
 
 HttpClient::~HttpClient() {
     qDebug() << "HttpClient::~HttpClient";
     if (manager != nullptr) {
         manager->deleteLater();
+        delete manager;
     }
 }
 
@@ -58,6 +59,22 @@ void HttpClient::userRegister(const QString &userName, const QString &password, 
     });
 }
 
+void HttpClient::userInfo(const QString &userInfo) {
+    //curl --location --request GET 'http://localhost:10492/api/user/id/?user_id={}&search_id={}'
+    qDebug() << "HttpClient::userInfo";
+    const auto data = QJsonObject{
+        {"user_id", userInfo},
+        {"search_id", userInfo}
+    };
+    QNetworkRequest request(QUrl{baseUrl + "/user/id/"});
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QNetworkReply *reply = manager->get(request);
+    connect(reply, &QNetworkReply::finished, this, [this,reply]() {
+        userInfoResponse(reply);
+    });
+}
+
 void HttpClient::userLoginResponse(QNetworkReply *reply) {
     qDebug() << "HttpClient::userLoginResponse";
     if (reply->error() == QNetworkReply::NoError) {
@@ -67,8 +84,13 @@ void HttpClient::userLoginResponse(QNetworkReply *reply) {
         const auto code = json["code"].toInt();
         const auto &message = json["message"].toString();
         const auto &result = json["result"].toString();
-
         emit userLogged(code, result, message);
+
+        const auto& data = json["data"].toObject();
+        const auto& token = data["token"].toString();
+
+        UserManager::getInstance()->setLoginStatus(code == 200);
+        //todo 完成添加token
     }
     else {
         qDebug() << "HttpClient::userLoginResponse: " << reply->errorString();
@@ -95,9 +117,31 @@ void HttpClient::userRegisterResponse(QNetworkReply *reply) {
     }
 }
 
+void HttpClient::userInfoResponse(QNetworkReply *reply) {
+    qDebug() << "HttpClient::userInfoResponse";
+    if (reply->error() != QNetworkReply::NoError) {
+        qDebug() << "HttpClient::userInfoResponse: " << reply->errorString();
+        emit requestFailed(reply->errorString());
+        return;
+    }
+    const auto response = reply->readAll();
+    const auto jsonResponse = QJsonDocument::fromJson(response);
+
+    const auto code = jsonResponse["code"].toInt();
+    const auto &message = jsonResponse["message"].toString();
+    const auto &result = jsonResponse["result"].toString();
+    emit userInfoFetched(code, result, message);
+
+    const auto& data = jsonResponse["data"].toObject();
+    const auto& groupId = data["group_id"].toString();
+    const auto& id = data["_id"].toString();
+    const auto& name = data["name"].toString();
+    const auto& role = data["role"].toInt();
+    //todo 完成添加用户信息
+
+}
+
 HttpClient::HttpClient()
     : baseUrl("http://localhost:10492/api"), manager(new QNetworkAccessManager(this)) {
     qDebug() << "HttpClient::HttpClient";
-
-    const auto request = QNetworkRequest(QUrl{baseUrl + "/hello/say"});
 }

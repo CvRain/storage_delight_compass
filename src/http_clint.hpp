@@ -10,6 +10,7 @@
 #include <QObject>
 #include <QJsonObject>
 
+#include "user_info.hpp"
 #include "types/result.hpp"
 
 /**
@@ -24,16 +25,26 @@ public:
     ~HttpClient() override;
 
     Q_INVOKABLE void login(const QString &userName, const QString &password);
-    Q_INVOKABLE void userRegister(const QString& userName, const QString &password, int role);
+
+    Q_INVOKABLE void userRegister(const QString &userName, const QString &password, int role);
+
+    Q_INVOKABLE void userInfo(const QString &userInfo);
 
 signals:
     void requestFailed(const QString &error);
+
     void userLogged(int code, const QString &result, const QString &message);
+
     void userRegistered(int code, const QString &result, const QString &message);
+
+    void userInfoFetched(int code, const QString &result, const QString &message);
 
 protected:
     void userLoginResponse(QNetworkReply *reply);
+
     void userRegisterResponse(QNetworkReply *reply);
+
+    void userInfoResponse(QNetworkReply *userInfo);
 
 private:
     explicit HttpClient();
@@ -41,6 +52,5 @@ private:
     const QString baseUrl;
     QNetworkAccessManager *manager;
 };
-
 
 #endif //HTTP_CLINT_HPP

@@ -59,6 +59,7 @@ private:
 };
 
 class ResponseResult final : public BaseResult {
+
 };
 
 #endif //RESULT_HPP

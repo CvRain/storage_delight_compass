@@ -17,7 +17,9 @@ int main(int argc, char *argv[]) {
         Qt::QueuedConnection);
 
     qmlRegisterSingletonInstance<HttpClient>("Storage.Service", 1, 0, "HttpClient", HttpClient::getInstance());
-    qmlRegisterSingletonInstance<UserInfo>("Storage.User", 1, 0, "UserInfo", UserInfo::getInstance());
+    qmlRegisterSingletonInstance<UserManager>("Storage.Service", 1, 0, "UserManager", UserManager::getInstance());
+
+    qmlRegisterType<UserInfo>("Storage.Model", 1, 0, "UserInfo");
     qmlRegisterType<BaseResult>("Storage.Model", 1, 0, "BaseResult");
 
     engine.load("qrc:/qt/qml/storage_delight_compass/DelightUI/App.qml");
