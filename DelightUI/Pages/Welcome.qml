@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Controls
 import Storage.Service 1.0
 import Storage.Model
-import Storage.User
 import "../Components"
 
 pragma ComponentBehavior: Bound

@@ -15,8 +15,8 @@
 HttpClient* HttpClient::getInstance() {
     qDebug() << "HttpClient::getInstance";
 
-    static HttpClient* instance;
-    return instance;
+    static auto instance = HttpClient{};
+    return &instance;
 }
 
 HttpClient::~HttpClient() {
@@ -90,7 +90,7 @@ void HttpClient::userLoginResponse(QNetworkReply *reply) {
         const auto& token = data["token"].toString();
 
         UserManager::getInstance()->setLoginStatus(code == 200);
-        //todo 完成添加token
+        UserManager::getInstance()->getUserInfo().setToken(token);
     }
     else {
         qDebug() << "HttpClient::userLoginResponse: " << reply->errorString();
@@ -137,7 +137,11 @@ void HttpClient::userInfoResponse(QNetworkReply *reply) {
     const auto& id = data["_id"].toString();
     const auto& name = data["name"].toString();
     const auto& role = data["role"].toInt();
-    //todo 完成添加用户信息
+    //添加用户信息
+    UserManager::getInstance()->getUserInfo().setGroupId(groupId);
+    UserManager::getInstance()->getUserInfo().setId(id);
+    UserManager::getInstance()->getUserInfo().setName(name);
+    UserManager::getInstance()->getUserInfo().setRole(role);
 
 }
 

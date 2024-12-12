@@ -57,10 +57,11 @@ public:
     static UserManager* getInstance();
 
     Q_INVOKABLE void setLoginStatus(bool status);
+    UserInfo& getUserInfo();
 
 signals:
     void loginStatusChanged(bool status);
-
+    void userInfoChanged(const UserInfo& info);
 private:
     explicit UserManager(QObject *parent = nullptr);
 

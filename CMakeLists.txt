@@ -40,7 +40,9 @@ set(QML_COMPONENTS
         ${COMPONENT_QML_PATH}/InputBar.qml
         ${COMPONENT_QML_PATH}/BaseButton.qml
         DelightUI/Components/FlatSwitch.qml
-        DelightUI/Components/Alert.qml)
+        DelightUI/Components/Alert.qml
+        DelightUI/Components/TopBar.qml
+        DelightUI/Components/SideButton.qml)
 
 set(QML_RESOURCES DelightUI/Components/qmldir DelightUI/Pages/qmldir DelightUI/qmldir)
 

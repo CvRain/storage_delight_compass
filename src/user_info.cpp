@@ -57,5 +57,9 @@ void UserManager::setLoginStatus(const bool status) {
     emit loginStatusChanged(status);
 }
 
+UserInfo & UserManager::getUserInfo() {
+    return this->info;
+}
+
 UserManager::UserManager(QObject *parent) : QObject(parent){
 }
