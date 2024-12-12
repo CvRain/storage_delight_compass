@@ -1,5 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QtWebEngineQuick/qtwebenginequickglobal.h>
 
 #include "types/result.hpp"
 #include "http_clint.hpp"
@@ -9,6 +10,8 @@ int main(int argc, char *argv[]) {
     const QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
+    QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+    QtWebEngineQuick::initialize();
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreationFailed,

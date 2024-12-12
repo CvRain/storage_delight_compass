@@ -13,6 +13,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
 endif()
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Quick)
+find_package(Qt6 6.5 REQUIRED COMPONENTS WebEngineQuick)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
@@ -67,7 +68,7 @@ set_target_properties(appstorage_delight_compass PROPERTIES
 )
 
 target_link_libraries(appstorage_delight_compass
-        PRIVATE Qt6::Quick Qt6::Network
+        PRIVATE Qt6::Quick Qt6::Network Qt6::WebEngineQuick
 
 )
 

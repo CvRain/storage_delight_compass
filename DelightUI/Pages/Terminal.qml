@@ -1,4 +1,6 @@
 import QtQuick
+import QtQuick.Controls
+import QtWebEngine
 import "../Components"
 
 Rectangle {
@@ -21,37 +23,60 @@ Rectangle {
 
     Rectangle {
         id: sideBar
-        width: 380
+        width: 245
         height: parent.height - topbar.height
-        color: "#414559"
+        color: "#e6e9ef"
         anchors.top: topbar.bottom
         anchors.left: parent.left
 
         Column {
             anchors.fill: sidebarBackground
-            spacing: 12
+            spacing: 0
 
             // Add multiple SideButtons here
             SideButton {
                 text: qsTr("Object browser")
                 width: sideBar.width
+                icon: "qrc:/res/icon/save-line.svg"
             }
             SideButton {
                 text: qsTr("Groups")
                 width: sideBar.width
+                icon: "qrc:/res/icon/group-line.svg"
             }
             SideButton{
                 text: qsTr("Members")
                 width: sideBar.width
-            }
-            SideButton {
-                text: qsTr("Sources terminal")
-                width: sideBar.width
+                icon:"qrc:/res/icon/user-line.svg"
             }
             SideButton{
                 text:qsTr("Personal info")
                 width: sideBar.width
+                icon:"qrc:/res/icon/settings-line.svg"
             }
+            SideButton{
+                text: qsTr("Console")
+                width: sideBar.width
+                icon: "qrc:/res/icon/terminal-line.svg"
+            }
+        }
+    }
+
+    StackView{
+        id: stackView
+        width: parent.width - sideBar.width
+        height: parent.height - topbar.height
+
+        anchors.top: topbar.bottom
+        anchors.left: sideBar.right
+
+        initialItem: consolePage
+    }
+
+    Component{
+        id: consolePage
+        WebEngineView{
+            url: "http://server.cloudvl.cn:10568/login"
         }
     }
 }

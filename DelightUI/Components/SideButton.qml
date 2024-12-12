@@ -1,9 +1,9 @@
 import QtQuick 2.15
 
 Rectangle {
-    property color bgColorNormal: "#414559"
-    property color bgColorHover: "#51576d"
-    property color bgColorClick: "#626880"
+    property color bgColorNormal: "#e6e9ef"
+    property color bgColorHover: "#bcc0cc"
+    property color bgColorClick: "#acb0be"
     property color lineColorHover: "#dc8a78"
     property color lineColorClick: "#e64533"
     property alias text: barText.text
@@ -18,12 +18,13 @@ Rectangle {
     width: 80
     height: 50
     color: root.bgColorNormal
+    border.color: "#acb0be"
 
     Image {
         id: barIcon
         source: ""
-        height: parent.height * 0.9
-        width: parent.height * 0.9
+        height: parent.height * 0.45
+        width: parent.height * 0.45
         autoTransform: true
         fillMode: Image.PreserveAspectFit
 
@@ -35,8 +36,8 @@ Rectangle {
     Text {
         id: barText
         text: "edit it"
-        color: "#eff1f5"
-        font.pixelSize: 26
+        color: "#4c4f69"
+        font.pixelSize: 18
         font.bold: true
         verticalAlignment: Text.AlignVCenter
 

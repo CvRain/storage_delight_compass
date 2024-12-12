@@ -7,7 +7,7 @@ Rectangle {
     id: root
     width: 1920
     height: 65
-    color: "#232634"
+    color: "#eff1f5"
 
     Image {
         id: icon
@@ -24,12 +24,13 @@ Rectangle {
     Text {
         id: barTitle
         text: "unknown user"
-        font.pixelSize: 28
-        color: "white"
+        font.pixelSize: 26
+        color: "#4c4f69"
         horizontalAlignment: Text.AlignRight
         verticalAlignment: Text.AlignVCenter
         width: parent.width / 5
         height: parent.height
+        font.bold: true
 
         anchors.right: parent.right
         anchors.rightMargin: 15
