@@ -18,7 +18,7 @@ Rectangle {
     width: 80
     height: 50
     color: root.bgColorNormal
-    border.color: "#acb0be"
+    border.color: "#eff1f5"
 
     Image {
         id: barIcon

@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtWebEngine
 import "../Components"
 
 Rectangle {
@@ -75,8 +74,9 @@ Rectangle {
 
     Component{
         id: consolePage
-        WebEngineView{
-            url: "http://server.cloudvl.cn:10568/login"
+        Console{
+            id: consolePageLoader
         }
     }
+
 }

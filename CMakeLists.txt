@@ -22,7 +22,9 @@ set(CPP_SRC src/main.cpp
         src/http_clint.hpp
         src/types/result.hpp
         src/user_info.cpp
-        src/user_info.hpp)
+        src/user_info.hpp
+        src/types/storage_source_model.hpp
+        src/types/storage_source_model.cpp)
 
 qt_add_executable(appstorage_delight_compass
         ${CPP_SRC}
@@ -34,7 +36,8 @@ set(COMPONENT_QML_PATH DelightUI/Components)
 set(QML_PAGES ${PAGE_QML_PATH}/Login.qml
         ${PAGE_QML_PATH}/Register.qml
         ${PAGE_QML_PATH}/Welcome.qml
-        ${PAGE_QML_PATH}/Terminal.qml)
+        ${PAGE_QML_PATH}/Terminal.qml
+        DelightUI/Pages/Console.qml)
 
 set(QML_COMPONENTS
         ${COMPONENT_QML_PATH}/Card.qml
@@ -43,7 +46,8 @@ set(QML_COMPONENTS
         DelightUI/Components/FlatSwitch.qml
         DelightUI/Components/Alert.qml
         DelightUI/Components/TopBar.qml
-        DelightUI/Components/SideButton.qml)
+        DelightUI/Components/SideButton.qml
+        )
 
 set(QML_RESOURCES DelightUI/Components/qmldir DelightUI/Pages/qmldir DelightUI/qmldir)
 
