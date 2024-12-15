@@ -3,6 +3,7 @@
 #include <QtWebEngineQuick/qtwebenginequickglobal.h>
 
 #include "types/result.hpp"
+#include "types/storage_source_model.hpp"
 #include "http_clint.hpp"
 #include "user_info.hpp"
 
@@ -24,6 +25,7 @@ int main(int argc, char *argv[]) {
 
     qmlRegisterType<UserInfo>("Storage.Model", 1, 0, "UserInfo");
     qmlRegisterType<BaseResult>("Storage.Model", 1, 0, "BaseResult");
+    qmlRegisterType<StorageSourceModel>("Storage.Model", 1, 0, "SourceList");
 
     engine.load("qrc:/qt/qml/storage_delight_compass/DelightUI/App.qml");
 

@@ -8,3 +8,4 @@ FlatSwitch  1.0 FlatSwitch.qml
 Alert   1.0 Alert.qml
 TopBar  1.0 TopBar.qml
 SideButton  1.0 SideButton.qml
+FlatComboBox 1.0 FlatComboBox.qml

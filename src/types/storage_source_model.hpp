@@ -15,9 +15,13 @@ Q_PROPERTY(int currentIdex READ getCurrentIndex NOTIFY currentIndexChanged)
 
 public:
     explicit StorageSourceModel(QObject* parent = nullptr);
-    [[nodiscard]] QStringList getItems() const;
-    [[nodiscard]] int getCurrentIndex() const;
-    void setCurrentIndex(int index);
+    [[nodiscard]] Q_INVOKABLE QStringList getItems() const;
+    [[nodiscard]] Q_INVOKABLE int getCurrentIndex() const;
+    [[nodiscard]] Q_INVOKABLE QString getUrl(int index) const;
+    [[nodiscard]] Q_INVOKABLE QString getName(int index) const;
+    void Q_INVOKABLE setCurrentIndex(int index);
+    void Q_INVOKABLE append(const QString &item);
+    void Q_INVOKABLE clear();
 
 signals:
     void itemsChanged();
@@ -25,6 +29,7 @@ signals:
 
 private:
     QStringList storageUrl;
+    QStringList storageName;
     int currentIndex;
 };
 

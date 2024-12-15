@@ -47,6 +47,7 @@ set(QML_COMPONENTS
         DelightUI/Components/Alert.qml
         DelightUI/Components/TopBar.qml
         DelightUI/Components/SideButton.qml
+        DelightUI/Components/FlatComboBox.qml
         )
 
 set(QML_RESOURCES DelightUI/Components/qmldir DelightUI/Pages/qmldir DelightUI/qmldir)

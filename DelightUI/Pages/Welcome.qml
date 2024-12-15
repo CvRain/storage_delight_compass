@@ -14,6 +14,17 @@ Rectangle {
     height: 1080
     color: "#e6e9ef"
 
+    Button{
+        id: testButton
+        width: 50
+        height: 50
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        onClicked: {
+            root.pageChange()
+        }
+    }
+
     StackView {
         id: stackView
         width: parent.width
