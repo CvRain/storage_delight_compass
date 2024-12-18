@@ -8,11 +8,12 @@
 #include "user_info.hpp"
 
 int main(int argc, char *argv[]) {
-    const QGuiApplication app(argc, argv);
 
-    QQmlApplicationEngine engine;
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QtWebEngineQuick::initialize();
+
+    const QGuiApplication app(argc, argv);
+    QQmlApplicationEngine engine;
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreationFailed,

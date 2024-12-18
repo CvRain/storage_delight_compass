@@ -74,6 +74,7 @@ Rectangle {
             alert.level = "error"
             alert.text = errorString
             alert.show()
+            console.error(errorString)
         }
 
         function onUserLogged(code, result, message){

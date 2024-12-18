@@ -4,11 +4,10 @@
 
 #ifndef HTTP_CLINT_HPP
 #define HTTP_CLINT_HPP
+#define _TURN_OFF_PLATFORM_STRING
 
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
+#include <cpprest/http_client.h>
 #include <QObject>
-#include <QJsonObject>
 
 #include "user_info.hpp"
 #include "types/result.hpp"
@@ -39,18 +38,11 @@ signals:
 
     void userInfoFetched(int code, const QString &result, const QString &message);
 
-protected:
-    void userLoginResponse(QNetworkReply *reply);
-
-    void userRegisterResponse(QNetworkReply *reply);
-
-    void userInfoResponse(QNetworkReply *userInfo);
-
 private:
     explicit HttpClient();
 
-    const QString baseUrl;
-    QNetworkAccessManager *manager;
+    const std::string baseUrl;
+    web::http::client::http_client client;
 };
 
 #endif //HTTP_CLINT_HPP
