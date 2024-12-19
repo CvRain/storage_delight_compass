@@ -38,6 +38,7 @@ public:
     Q_INVOKABLE void setGroupId(const QString &groupId);
 
     Q_INVOKABLE void setRole(int role);
+
 signals:
     void userInfoChanged();
 
@@ -57,11 +58,34 @@ public:
     static UserManager* getInstance();
 
     Q_INVOKABLE void setLoginStatus(bool status);
-    UserInfo& getUserInfo();
+
+    Q_INVOKABLE UserInfo& getUserInfo();
+
+    [[nodiscard]] Q_INVOKABLE QString getId() const;
+
+    [[nodiscard]] Q_INVOKABLE QString getToken() const;
+
+    [[nodiscard]] Q_INVOKABLE QString getName() const;
+
+    [[nodiscard]] Q_INVOKABLE QString getGroupId() const;
+
+    [[nodiscard]] Q_INVOKABLE int getRole() const;
+
+    Q_INVOKABLE void setId(const QString &userId);
+
+    Q_INVOKABLE void setToken(const QString &userToken);
+
+    Q_INVOKABLE void setName(const QString &userName);
+
+    Q_INVOKABLE void setGroupId(const QString &groupId);
+
+    Q_INVOKABLE void setRole(int role);
 
 signals:
     void loginStatusChanged(bool status);
-    void userInfoChanged(const UserInfo& info);
+
+    void userInfoChanged(const UserInfo &info);
+
 private:
     explicit UserManager(QObject *parent = nullptr);
 

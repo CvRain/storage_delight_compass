@@ -61,5 +61,45 @@ UserInfo & UserManager::getUserInfo() {
     return this->info;
 }
 
+QString UserManager::getId() const {
+    return info.getId();
+}
+
+QString UserManager::getToken() const {
+    return info.getToken();
+}
+
+void UserManager::setId(const QString &userId) {
+    info.setId(userId);
+}
+
+void UserManager::setToken(const QString &userToken) {
+    info.setToken(userToken);
+}
+
+void UserManager::setName(const QString &userName) {
+    info.setName(userName);
+}
+
+void UserManager::setGroupId(const QString &groupId) {
+    info.setGroupId(groupId);
+}
+
+void UserManager::setRole(int role) {
+    info.setRole(role);
+}
+
+QString UserManager::getName() const {
+    return info.getName();
+}
+
+QString UserManager::getGroupId() const {
+    return info.getGroupId();
+}
+
+int UserManager::getRole() const {
+    return info.getRole();
+}
+
 UserManager::UserManager(QObject *parent) : QObject(parent){
 }

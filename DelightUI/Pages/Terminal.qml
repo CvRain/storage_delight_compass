@@ -1,5 +1,7 @@
 import QtQuick
 import QtQuick.Controls
+import Storage.Service
+import Storage.Model
 import "../Components"
 
 Rectangle {
@@ -14,10 +16,15 @@ Rectangle {
         id: topbar
         width: parent.width
         height: 100
+    }
 
-        onUserLogout: {
-            root.pageChange()
-        }
+    Alert{
+        id: alert
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: parent.top
+        anchors.topMargin: 35
+        level: "warn"
+        text: "test alert"
     }
 
     Rectangle {
@@ -29,6 +36,9 @@ Rectangle {
         anchors.left: parent.left
 
         Column {
+            id: column
+            width: parent.width
+            height: parent.height - userName - logout
             anchors.fill: sidebarBackground
             spacing: 0
 
@@ -57,6 +67,45 @@ Rectangle {
                 text: qsTr("Console")
                 width: sideBar.width
                 icon: "qrc:/res/icon/terminal-line.svg"
+            }
+        }
+
+        Text {
+            id: userName
+            text: "unknown"
+            width: parent.width - 5
+            height: 25
+            font.pixelSize: 16
+            horizontalAlignment: Text.AlignLeft
+
+            anchors.left: parent.left
+            anchors.leftMargin: 5
+            anchors.bottom: logout.top
+            anchors.bottomMargin: 5
+
+            Component.onCompleted: {
+                alert.level = "info"
+                alert.text = "Welcome " + UserManager.getName()
+                alert.show()
+                userName.text = UserManager.getName()
+            }
+        }
+        Text{
+            id: logout
+            text: qsTr("logout")
+            width: parent.width - 5
+            height: 25
+            horizontalAlignment: Text.AlignLeft
+
+            anchors.left: parent.left
+            anchors.leftMargin: 5
+            anchors.bottom: parent.bottom
+
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    root.pageChange()
+                }
             }
         }
     }

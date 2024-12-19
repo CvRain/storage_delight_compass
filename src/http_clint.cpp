@@ -40,6 +40,10 @@ void HttpClient::login(const QString &userName, const QString &password) {
             const auto& responseToken = responseData.at(_XPLATSTR("data")).at(_XPLATSTR("token")).as_string();
             const auto& responseName = responseData.at(_XPLATSTR("data")).at(_XPLATSTR("name")).as_string();
             const auto& responseUserId = responseData.at(_XPLATSTR("data")).at(_XPLATSTR("user_id")).as_string();
+
+            UserManager::getInstance()->getUserInfo().setId(userName);
+            UserManager::getInstance()->getUserInfo().setToken(responseToken.data());
+            UserManager::getInstance()->getUserInfo().setName(responseName.data());
         }
         emit userLogged(responseCode, QString{responseResult.data()}, QString{responseMessage.data()});
     }catch (const std::exception& e) {
@@ -54,10 +58,13 @@ void HttpClient::userRegister(const QString &userName, const QString &password, 
     requestData[_XPLATSTR("name")] = web::json::value::string(userName.toStdString());
     requestData[_XPLATSTR("password")] = web::json::value::string(password.toStdString());
     requestData[_XPLATSTR("role")] = web::json::value::number(role);
+
     web::http::http_request request(web::http::methods::POST);
-    request.set_request_uri(_XPLATSTR("/user/register"));
+
+    request.set_request_uri(_XPLATSTR("/user/add"));
     request.headers().set_content_type(_XPLATSTR("application/json"));
     request.set_body(requestData);
+
     try {
         const auto response = client.request(request).get();
         const auto responseData = response.extract_json().get();

@@ -22,8 +22,8 @@ Item {
             width: parent.width / 5
             height: parent.height
             model: sourceList.items
-            anchors.left: combox.right
-            anchors.top: combox.top
+            anchors.left: bar.right
+            anchors.top: bar.top
             checkedColor: "#dc8a78"
 
             onActivated: {
