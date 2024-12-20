@@ -6,6 +6,7 @@
 #include "types/storage_source_model.hpp"
 #include "http_clint.hpp"
 #include "user_info.hpp"
+#include "types/storage_source.hpp"
 
 int main(int argc, char *argv[]) {
 
@@ -23,6 +24,7 @@ int main(int argc, char *argv[]) {
 
     qmlRegisterSingletonInstance<HttpClient>("Storage.Service", 1, 0, "HttpClient", HttpClient::getInstance());
     qmlRegisterSingletonInstance<UserManager>("Storage.Service", 1, 0, "UserManager", UserManager::getInstance());
+    qmlRegisterSingletonInstance<StorageSourceInstance>("Storage.Service", 1, 0, "StorageInstance", StorageSourceInstance::getInstance());
 
     qmlRegisterType<UserInfo>("Storage.Model", 1, 0, "UserInfo");
     qmlRegisterType<BaseResult>("Storage.Model", 1, 0, "BaseResult");

@@ -12,6 +12,7 @@
 #include "user_info.hpp"
 #include "types/result.hpp"
 
+class StorageSource;
 /**
  * @brief singleton http clint
  */
@@ -27,10 +28,14 @@ public:
 
     Q_INVOKABLE void userRegister(const QString &userName, const QString &password, int role);
 
-    Q_INVOKABLE void userInfo(const QString &userInfo);
+    Q_INVOKABLE void userInfo();
+
+    QList<StorageSource> storageSource();
 
 signals:
     void requestFailed(const QString &error);
+
+    void requestFinish(int code, const QString &result, const QString &message);
 
     void userLogged(int code, const QString &result, const QString &message);
 

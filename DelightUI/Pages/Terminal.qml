@@ -12,6 +12,10 @@ Rectangle {
 
     signal pageChange
 
+    Component.onCompleted: {
+        HttpClient.userInfo();
+    }
+
     TopBar {
         id: topbar
         width: parent.width
@@ -85,7 +89,7 @@ Rectangle {
 
             Component.onCompleted: {
                 alert.level = "info"
-                alert.text = "Welcome " + UserManager.getName()
+                alert.text = "Welcome " + UserManager.getName() + "id: " + UserManager.getId()
                 alert.show()
                 userName.text = UserManager.getName()
             }

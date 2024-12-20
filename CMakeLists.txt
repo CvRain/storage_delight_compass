@@ -25,7 +25,9 @@ set(CPP_SRC src/main.cpp
         src/user_info.cpp
         src/user_info.hpp
         src/types/storage_source_model.hpp
-        src/types/storage_source_model.cpp)
+        src/types/storage_source_model.cpp
+        src/types/storage_source.cpp
+        src/types/storage_source.hpp)
 
 qt_add_executable(appstorage_delight_compass
         ${CPP_SRC}

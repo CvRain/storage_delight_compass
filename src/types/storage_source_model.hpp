@@ -8,6 +8,8 @@
 #include <QObject>
 #include <QStringList>
 
+#include "storage_source.hpp"
+
 class StorageSourceModel: public QObject{
 Q_OBJECT
 Q_PROPERTY(QStringList items READ getItems NOTIFY itemsChanged)
@@ -19,17 +21,15 @@ public:
     [[nodiscard]] Q_INVOKABLE int getCurrentIndex() const;
     [[nodiscard]] Q_INVOKABLE QString getUrl(int index) const;
     [[nodiscard]] Q_INVOKABLE QString getName(int index) const;
-    void Q_INVOKABLE setCurrentIndex(int index);
-    void Q_INVOKABLE append(const QString &item);
-    void Q_INVOKABLE clear();
+    Q_INVOKABLE void update();
+    Q_INVOKABLE void setCurrentIndex(int index);
 
 signals:
     void itemsChanged();
     void currentIndexChanged();
 
 private:
-    QStringList storageUrl;
-    QStringList storageName;
+    QList<StorageSource> sources{};
     int currentIndex;
 };
 
