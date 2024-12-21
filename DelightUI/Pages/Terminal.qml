@@ -51,26 +51,42 @@ Rectangle {
                 text: qsTr("Object browser")
                 width: sideBar.width
                 icon: "qrc:/res/icon/save-line.svg"
+
+                onClicked: {
+                    stackView.replace(objectBrowerPage)
+                }
             }
             SideButton {
                 text: qsTr("Groups")
                 width: sideBar.width
                 icon: "qrc:/res/icon/group-line.svg"
+                onClicked: {
+                    stackView.replace(groupsPage)
+                }
             }
             SideButton{
                 text: qsTr("Members")
                 width: sideBar.width
                 icon:"qrc:/res/icon/user-line.svg"
+                onClicked: {
+                    stackView.replace(membersPage)
+                }
             }
             SideButton{
                 text:qsTr("Personal info")
                 width: sideBar.width
                 icon:"qrc:/res/icon/settings-line.svg"
+                onClicked: {
+                    stackView.replace(personalPage)
+                }
             }
             SideButton{
                 text: qsTr("Console")
                 width: sideBar.width
                 icon: "qrc:/res/icon/terminal-line.svg"
+                onClicked: {
+                    stackView.replace(consolePage)
+                }
             }
         }
 
@@ -129,6 +145,34 @@ Rectangle {
         id: consolePage
         Console{
             id: consolePageLoader
+        }
+    }
+
+    Component{
+        id: objectBrowerPage
+        ObjectBrowser{
+            id: objectBrowserPageLoader
+        }
+    }
+
+    Component{
+        id: groupsPage
+        Groups{
+            id: groupPageLoader
+        }
+    }
+
+    Component{
+        id: membersPage
+        Members{
+            id: memberPageLoader
+        }
+    }
+
+    Component{
+        id: personalPage
+        Personal{
+            id: personalPageLoader
         }
     }
 

@@ -85,15 +85,14 @@ void HttpClient::userRegister(const QString &userName, const QString &password, 
 }
 
 /// <summary>
-/// <code> curl --location --request GET
-/// 'http://localhost:10492/api/user/info' \
-/// --header 'Content-Type: application/json' \
+/// <code> curl --location --request GET 'http://localhost:10492/api/user/info'
+/// --header 'Content-Type: application/json'
 /// --data-raw '{
 /// "user_id" : "67459983948109dbd1079573" ,
 /// "search_id" : "67459983948109dbd1079573"
 /// }'
-///</code>
-///</summary>
+/// </code>
+/// </summary>
 
 void HttpClient::userInfo() {
     qDebug() << "HttpClient::userInfo";
@@ -177,6 +176,57 @@ QList<StorageSource> HttpClient::storageSource() {
         qDebug() << e.what();
         emit requestFailed(QString{e.what()});
         return {};
+    }
+}
+
+/// <summary>
+/// 添加一个存储源
+/// <code>
+/// curl --location --request PUT 'http://localhost:10492/api/StorageSource/add'
+/// --header 'Content-Type: application/json'
+/// --data-raw '{
+///     "name": "string",
+///     "url": "string",
+///     "access_key": "string",
+///     "secret_key": "string",
+///     "user_id": "string",
+///     "is_https":false
+/// }'
+/// </code>
+/// </summary>
+CommonResponse HttpClient::addStorageSource(const StorageSource &source) {
+    qDebug() << "HttpClient::addStorageSource";
+
+    web::json::value requestData;
+    requestData[_XPLATSTR("name")] = web::json::value::string(source.getName().toStdString());
+    requestData[_XPLATSTR("url")] = web::json::value::string(source.getUrl().toStdString());
+    requestData[_XPLATSTR("access_key")] = web::json::value::string(source.getAk().toStdString());
+    requestData[_XPLATSTR("secret_key")] = web::json::value::string(source.getSk().toStdString());
+    requestData[_XPLATSTR("user_id")] = web::json::value::string(UserManager::getInstance()->getId().toStdString());
+    requestData[_XPLATSTR("is_https")] = web::json::value::boolean(source.getIsHttps());
+
+    web::http::http_request request(web::http::methods::PUT);
+    request.set_request_uri(_XPLATSTR("/StorageSource/add"));
+    request.headers().set_content_type(_XPLATSTR("application/json"));
+    request.set_body(requestData);
+    try {
+        const auto response = client.request(request).get();
+        const auto responseData = response.extract_json().get();
+        const auto &responseCode = responseData.at(_XPLATSTR("code")).as_number().to_int32();
+        const auto &responseMessage = responseData.at(_XPLATSTR("message")).as_string();
+        const auto &responseResult = responseData.at(_XPLATSTR("result")).as_string();
+
+        emit requestFinish(responseCode, QString{responseResult.data()}, QString{responseMessage.data()});
+
+        CommonResponse backResponse;
+        backResponse.data = {};
+        backResponse.code = responseCode;
+        backResponse.message = responseMessage;
+        backResponse.result = responseResult;
+        return backResponse;
+    }catch (const std::exception &e) {
+        emit requestFailed(QString{e.what()});
+        throw;
     }
 }
 

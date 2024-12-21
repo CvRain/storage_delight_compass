@@ -5,6 +5,9 @@
 #include "storage_source_model.hpp"
 
 #include <QDebug>
+#include <QObject>
+#include <qtmetamacros.h>
+
 #include "storage_source.hpp"
 #include "src/http_clint.hpp"
 
@@ -44,4 +47,18 @@ void StorageSourceModel::setCurrentIndex(const int index) {
         return;
     }
     currentIndex = index;
+}
+
+void StorageSourceModel::remove(int index) {
+
+}
+
+void StorageSourceModel::add(const StorageSource &source) {
+    if (const auto result = HttpClient::getInstance()->addStorageSource(source); result.code != 200) {
+        qDebug() << "add storage source failed";
+        emit requestFailed(result.message.data());
+        return;
+    }
+    this->update();
+    emit itemsChanged();
 }

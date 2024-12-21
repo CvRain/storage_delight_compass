@@ -23,16 +23,17 @@ public:
     [[nodiscard]] Q_INVOKABLE QString getName(int index) const;
     Q_INVOKABLE void update();
     Q_INVOKABLE void setCurrentIndex(int index);
+    Q_INVOKABLE void remove(int index);
+    Q_INVOKABLE void add(const StorageSource& source);
 
 signals:
     void itemsChanged();
     void currentIndexChanged();
+    void requestFailed(const QString& error);
 
 private:
     QList<StorageSource> sources{};
     int currentIndex;
 };
-
-
 
 #endif //STORAGE_SOURCE_MODEL_HPP

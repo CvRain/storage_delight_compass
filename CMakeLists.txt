@@ -27,7 +27,8 @@ set(CPP_SRC src/main.cpp
         src/types/storage_source_model.hpp
         src/types/storage_source_model.cpp
         src/types/storage_source.cpp
-        src/types/storage_source.hpp)
+        src/types/storage_source.hpp
+        src/types/response.hpp)
 
 qt_add_executable(appstorage_delight_compass
         ${CPP_SRC}
@@ -40,7 +41,11 @@ set(QML_PAGES ${PAGE_QML_PATH}/Login.qml
         ${PAGE_QML_PATH}/Register.qml
         ${PAGE_QML_PATH}/Welcome.qml
         ${PAGE_QML_PATH}/Terminal.qml
-        DelightUI/Pages/Console.qml)
+        ${PAGE_QML_PATH}/Console.qml
+        ${PAGE_QML_PATH}/ObjectBrowser.qml
+        ${PAGE_QML_PATH}/Groups.qml
+        ${PAGE_QML_PATH}/Members.qml
+        ${PAGE_QML_PATH}/Personal.qml)
 
 set(QML_COMPONENTS
         ${COMPONENT_QML_PATH}/Card.qml

@@ -8,7 +8,7 @@ StorageSource::StorageSource(QObject *parent): QObject(parent) {
 }
 
 StorageSource::StorageSource(const StorageSource &source)
-    : id(source.id), ak(source.ak), sk(source.sk), url(source.url), name(source.name) {
+    : id(source.id), ak(source.ak), sk(source.sk), url(source.url), name(source.name), isHttps(source.isHttps){
 }
 
 StorageSource& StorageSource::operator=(const StorageSource &source) {
@@ -17,6 +17,7 @@ StorageSource& StorageSource::operator=(const StorageSource &source) {
     sk = source.sk;
     url = source.url;
     name = source.name;
+    isHttps = source.isHttps;
     return *this;
 }
 

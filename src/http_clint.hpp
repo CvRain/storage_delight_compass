@@ -10,7 +10,9 @@
 #include <QObject>
 
 #include "user_info.hpp"
+#include "types/response.hpp"
 #include "types/result.hpp"
+#include "types/storage_source.hpp"
 
 class StorageSource;
 /**
@@ -31,6 +33,8 @@ public:
     Q_INVOKABLE void userInfo();
 
     QList<StorageSource> storageSource();
+
+    CommonResponse addStorageSource(const StorageSource& source);
 
 signals:
     void requestFailed(const QString &error);

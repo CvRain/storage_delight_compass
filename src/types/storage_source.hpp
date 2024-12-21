@@ -10,6 +10,12 @@
 
 class StorageSource: public QObject{
     Q_OBJECT
+    Q_PROPERTY(QString id READ getId WRITE setId)
+    Q_PROPERTY(QString ak READ getAk WRITE setAk)
+    Q_PROPERTY(QString sk READ getSk WRITE setSk)
+    Q_PROPERTY(QString url READ getUrl WRITE setUrl)
+    Q_PROPERTY(QString name READ getName WRITE setName)
+    Q_PROPERTY(bool isHttps READ getIsHttps WRITE setIsHttps);
 public:
     explicit StorageSource(QObject *parent = nullptr);
 
@@ -27,6 +33,8 @@ public:
 
     [[nodiscard]] QString getName() const { return name; }
 
+    [[nodiscard]] bool getIsHttps() const { return isHttps; }
+
     void setId(const QString &id) { this->id = id; }
 
     void setAk(const QString &ak) { this->ak = ak; }
@@ -37,12 +45,15 @@ public:
 
     void setName(const QString &name) { this->name = name; }
 
+    void setIsHttps(const bool isHttps) { this->isHttps = isHttps; }
+
 private:
     QString id;
     QString ak;
     QString sk;
     QString url;
     QString name;
+    bool isHttps{};
 };
 
 class StorageSourceInstance: public QObject {

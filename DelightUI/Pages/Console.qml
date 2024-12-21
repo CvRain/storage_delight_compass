@@ -7,8 +7,7 @@ import "../Components"
 
 Item {
     id: root
-    width: parent.width
-    height: parent.height
+    anchors.fill: parent
 
     Rectangle{
         id: bar
@@ -18,44 +17,67 @@ Item {
         border.color: "#ccd0da"
         border.width: 2
 
-        FlatComboBox{
-            id: combox
-            width: parent.width / 5
-            height: parent.height
-            model: sourceList.items
+        Row{
+            id: topbarMenu
             anchors.left: bar.left
             anchors.top: bar.top
-            checkedColor: "#dc8a78"
-
-            onActivated: {
-                webview.url = sourceList.getUrl(currentIndex)
-                storageName.text = sourceList.getUrl(0)
-            }
-
-            onCurrentIndexChanged: {
-                sourceList.setCurrentIndex(currentIndex)
-                storageName.text = sourceList.getUrl(0)
-            }
-        }
-
-        Button{
-            id: updateButton
-            width: 45
+            spacing: 5
+            width: parent.width - storageName
             height: parent.height
-            background: Rectangle{
+
+            FlatComboBox{
+                id: combox
+                model: sourceList.items
+                checkedColor: "#dc8a78"
+
+                onActivated: {
+                    webview.url = sourceList.getUrl(currentIndex)
+                    storageName.text = sourceList.getUrl(0)
+                }
+
+                onCurrentIndexChanged: {
+                    sourceList.setCurrentIndex(currentIndex)
+                    storageName.text = sourceList.getUrl(0)
+                }
+            }
+
+            BaseButton{
+                id: updateButton
+                width: 65
+                height: parent.height
+                text: qsTr("update")
+                textColor: "white"
+                radius: 5
                 color: combox.checkedColor
-                radius: 15
-            }
-            text: qsTr("update")
-
-            onClicked: {
-                sourceList.update()
-                console.debug("source list update")
+                onClicked: {
+                    sourceList.update()
+                }
             }
 
-            anchors.left: combox.right
-            anchors.leftMargin: 10
-            anchors.top: combox.top
+            BaseButton{
+                id: removeItemButton
+                width: 65
+                text: qsTr("remove")
+                textColor: "white"
+                radius: 5
+                color: combox.checkedColor
+                onClicked: {
+                }
+            }
+
+            BaseButton{
+                id: addItemButton
+                width: 65
+                text: qsTr("add")
+                textColor: "white"
+                radius: 5
+                color: combox.checkedColor
+                onClicked: {
+
+                }
+
+            }
+
         }
 
         Text {
@@ -64,6 +86,7 @@ Item {
             font.pixelSize: 16
             color: "#dd7878"
             font.bold: true
+            width: 100
 
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignRight

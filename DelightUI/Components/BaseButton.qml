@@ -16,14 +16,14 @@ Rectangle{
 
     Text{
         id: buttonText
-        anchors.fill: parent
         text: qsTr("Sign in")
         font.pixelSize: 18
         font.bold: true
         color: "#4c4f69"
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
-
+        anchors.centerIn: parent
+        anchors.fill: parent
     }
 
     MouseArea{
@@ -31,12 +31,10 @@ Rectangle{
         hoverEnabled: true
 
         onEntered:{
-            root.color = "#acb0be"
             root.entered()
         }
 
         onExited:{
-            root.color = "#bcc0cc"
             root.exited()
         }
 
