@@ -21,6 +21,7 @@ public:
     [[nodiscard]] Q_INVOKABLE int getCurrentIndex() const;
     [[nodiscard]] Q_INVOKABLE QString getUrl(int index) const;
     [[nodiscard]] Q_INVOKABLE QString getName(int index) const;
+    [[nodiscard]] Q_INVOKABLE int size() const;
     Q_INVOKABLE void update();
     Q_INVOKABLE void setCurrentIndex(int index);
     Q_INVOKABLE void remove(int index);

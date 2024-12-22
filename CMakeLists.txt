@@ -56,6 +56,8 @@ set(QML_COMPONENTS
         DelightUI/Components/TopBar.qml
         DelightUI/Components/SideButton.qml
         DelightUI/Components/FlatComboBox.qml
+        DelightUI/Components/StorageSoreAppend.qml
+        DelightUI/Components/StorageSoreRemove.qml
         )
 
 set(QML_RESOURCES DelightUI/Components/qmldir DelightUI/Pages/qmldir DelightUI/qmldir)

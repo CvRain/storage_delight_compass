@@ -5,20 +5,18 @@
 #include "storage_source_model.hpp"
 
 #include <QDebug>
-#include <QObject>
-#include <qtmetamacros.h>
 
 #include "storage_source.hpp"
 #include "src/http_clint.hpp"
 
 StorageSourceModel::StorageSourceModel(QObject *parent)
-: QObject(parent), currentIndex(0) {
+    : QObject(parent), currentIndex(0) {
     this->sources = HttpClient::getInstance()->storageSource();
 }
 
 QStringList StorageSourceModel::getItems() const {
     QStringList storageName;
-    for (const auto& it : sources) {
+    for (const auto &it: sources) {
         storageName << it.getName();
     }
     return storageName;
@@ -36,6 +34,10 @@ QString StorageSourceModel::getName(const int index) const {
     return sources.at(index).getName();
 }
 
+int StorageSourceModel::size() const {
+    return sources.size();
+}
+
 void StorageSourceModel::update() {
     qDebug() << "StorageSourceModel::update";
     this->sources = HttpClient::getInstance()->storageSource();
@@ -50,10 +52,26 @@ void StorageSourceModel::setCurrentIndex(const int index) {
 }
 
 void StorageSourceModel::remove(int index) {
+    if (UserManager::getInstance()->getRole() == 0){
+        emit requestFailed("You do not have permission to do this");
+        return;
+    }
 
+    const auto storageId = sources.at(index).getId();
+    if (const auto result = HttpClient::getInstance()->removeStorageSource(storageId.toStdString());
+        result.code != 200) {
+        qDebug() << "remove storage source failed";
+        emit requestFailed(result.message.data());
+        return;
+    }
 }
 
 void StorageSourceModel::add(const StorageSource &source) {
+    if (UserManager::getInstance()->getRole() == 0){
+        emit requestFailed("You do not have permission to do this");
+        return;
+    }
+
     if (const auto result = HttpClient::getInstance()->addStorageSource(source); result.code != 200) {
         qDebug() << "add storage source failed";
         emit requestFailed(result.message.data());

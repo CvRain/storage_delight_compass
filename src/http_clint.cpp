@@ -156,7 +156,7 @@ QList<StorageSource> HttpClient::storageSource() {
         QList<StorageSource> sources;
         if (responseCode == 200) {
             for (const auto &responseDataArray = responseData.at(_XPLATSTR("data")).as_array();
-                const auto &item: responseDataArray) {
+                 const auto &item: responseDataArray) {
                 const auto &itemData = item.as_object();
                 StorageSource source;
                 source.setId(itemData.at(_XPLATSTR("_id")).as_string().data());
@@ -165,7 +165,7 @@ QList<StorageSource> HttpClient::storageSource() {
                 source.setAk(itemData.at(_XPLATSTR("access_key")).as_string().data());
                 source.setSk(itemData.at(_XPLATSTR("secret_key")).as_string().data());
                 qDebug() << "source:" << source.getId() << source.getName() << source.getUrl() << source.getAk()
-                         << source.getSk();
+                        << source.getSk();
                 sources.append(source);
             }
         }
@@ -224,7 +224,52 @@ CommonResponse HttpClient::addStorageSource(const StorageSource &source) {
         backResponse.message = responseMessage;
         backResponse.result = responseResult;
         return backResponse;
-    }catch (const std::exception &e) {
+    }
+    catch (const std::exception &e) {
+        emit requestFailed(QString{e.what()});
+        throw;
+    }
+}
+
+/// <summary>
+/// 删除一个存储源
+/// <code>
+/// curl --location --request DELETE 'http://localhost:10492/api/StorageSource/remove'
+/// --header 'Content-Type: application/json'
+/// --data-raw '{
+///     "user_id": "670d399eb8679e9edc0a90c3",
+///     "source_id": "6734670d840bd161d30c9799"
+/// }'
+/// </code>
+/// </summary>
+CommonResponse HttpClient::removeStorageSource(const std::string& storageId) {
+    qDebug() << "HttpClient::removeStorageSource";
+
+    const auto userId = UserManager::getInstance()->getId().toStdString();
+
+    web::json::value requestData;
+    requestData[_XPLATSTR("user_id")] = web::json::value::string(userId);
+    requestData[_XPLATSTR("source_id")] = web::json::value::string(storageId);
+    web::http::http_request request(web::http::methods::DEL);
+    request.set_request_uri(_XPLATSTR("/StorageSource/remove"));
+    request.headers().set_content_type(_XPLATSTR("application/json"));
+    request.set_body(requestData);
+
+    try {
+        const auto response = client.request(request).get();
+        const auto responseData = response.extract_json().get();
+        const auto &responseCode = responseData.at(_XPLATSTR("code")).as_number().to_int32();
+        const auto &responseMessage = responseData.at(_XPLATSTR("message")).as_string();
+        const auto &responseResult = responseData.at(_XPLATSTR("result")).as_string();
+        emit requestFinish(responseCode, QString{responseResult.data()}, QString{responseMessage.data()});
+        CommonResponse backResponse;
+        backResponse.data = {};
+        backResponse.code = responseCode;
+        backResponse.message = responseMessage;
+        backResponse.result = responseResult;
+        return backResponse;
+    }
+    catch (const std::exception &e) {
         emit requestFailed(QString{e.what()});
         throw;
     }

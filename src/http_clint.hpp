@@ -36,6 +36,8 @@ public:
 
     CommonResponse addStorageSource(const StorageSource& source);
 
+    CommonResponse removeStorageSource(const std::string& storageId);
+
 signals:
     void requestFailed(const QString &error);
 

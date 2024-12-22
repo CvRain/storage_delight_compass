@@ -145,6 +145,7 @@ Rectangle {
         id: consolePage
         Console{
             id: consolePageLoader
+            alertInstance: alert
         }
     }
 
