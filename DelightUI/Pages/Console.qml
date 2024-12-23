@@ -11,7 +11,7 @@ Item {
     id: root
     anchors.fill: parent
 
-    Rectangle{
+    Rectangle {
         id: bar
         width: root.width
         height: 40
@@ -19,7 +19,7 @@ Item {
         border.color: "#ccd0da"
         border.width: 2
 
-        Row{
+        Row {
             id: topbarMenu
             anchors.left: bar.left
             anchors.top: bar.top
@@ -27,7 +27,7 @@ Item {
             width: parent.width - storageName
             height: parent.height
 
-            FlatComboBox{
+            FlatComboBox {
                 id: combox
 
                 checkedColor: "#dc8a78"
@@ -46,7 +46,7 @@ Item {
                 }
             }
 
-            BaseButton{
+            BaseButton {
                 id: updateButton
                 width: 65
                 height: parent.height
@@ -59,7 +59,7 @@ Item {
                 }
             }
 
-            BaseButton{
+            BaseButton {
                 id: removeItemButton
                 width: 65
                 height: parent.height
@@ -68,18 +68,18 @@ Item {
                 radius: 5
                 color: combox.checkedColor
                 onClicked: {
-                    if(sourceList.size() === 0){
+                    if (sourceList.size() === 0) {
                         alertInstance.left = "warn"
                         alertInstance.text = "no storage"
                         alertInstance.show()
-                        return;
+                        return
                     }
                     var dialogInstance = removeStorageDialog.createObject(root)
                     dialogInstance.open()
                 }
             }
 
-            BaseButton{
+            BaseButton {
                 id: addItemButton
                 width: 65
                 height: parent.height
@@ -87,12 +87,22 @@ Item {
                 textColor: "white"
                 radius: 5
                 color: combox.checkedColor
-                onClicked: {
-                    var dialogInstance = addStorageDialog.createObject(root)
-                    dialogInstance.open()
+
+                Connections{
+                    target: addItemButton
+                    function onClicked(){
+                        console.debug("User role ", UserManager.getRole())
+                        if (UserManager.getRole() !== 0 ) {
+                            alertInstance.text = qsTr("No permission")
+                            alertInstance.level = "warn"
+                            alertInstance.show()
+                            return
+                        }
+                        var dialogInstance = addStorageDialog.createObject(root)
+                        dialogInstance.open()
+                    }
                 }
             }
-
         }
 
         Text {
@@ -110,21 +120,31 @@ Item {
         }
     }
 
-    Component{
+    Component {
         id: addStorageDialog
-        StorageSoreAppend{
+
+        StorageSoreAppend {
             anchors.centerIn: parent
+
+            onAccepted: {
+                var sourceData = {
+                    "ak": akText,
+                    "sk": skText,
+                    "isHttps": isHttp,
+                    "url": urlText,
+                    "name": nameText
+                }
+                sourceList.append(sourceData)
+            }
         }
-
-
     }
 
-    Component{
+    Component {
         id: removeStorageDialog
-        StorageSoreRemove{
+        StorageSoreRemove {
             anchors.centerIn: parent
             onAccepted: {
-                if(sourceList.size() !== 0){
+                if (sourceList.size() !== 0) {
                     sourceList.remove(sourceList.currentIdex)
                     return
                 }
@@ -132,7 +152,7 @@ Item {
         }
     }
 
-    WebEngineView{
+    WebEngineView {
         id: webview
         width: parent.width
         height: parent.height - bar.height
@@ -140,32 +160,31 @@ Item {
         anchors.left: bar.left
     }
 
-    SourceList{
+    SourceList {
         id: sourceList
 
         onRequestFailed: {
-            alertInstance.level = "error"
             alertInstance.text = error
+            alertInstance.left = "error"
             alertInstance.show()
         }
     }
 
-    function storageUpdate(){
+    function storageUpdate() {
         sourceList.update()
         alertInstance.text = "update"
         alertInstance.level = "info"
         alertInstance.show()
         console.debug("storage source update")
 
-        if(sourceList.size() === 0){
+        if (sourceList.size() === 0) {
             webview.url = "https://doc.qt.io/"
             storageName = "no storage source"
             alertInstance.text = "no storage source"
             alertInstance.level = "info"
             alertInstance.show()
-
-        }else{
-            model = sourceList.items
+        } else {
+            combox.model = sourceList.items
             webview.url = sourceList.getUrl(0)
             storageName.text = sourceList.getUrl(0)
         }

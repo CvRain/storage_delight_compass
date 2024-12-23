@@ -29,6 +29,7 @@ int main(int argc, char *argv[]) {
     qmlRegisterType<UserInfo>("Storage.Model", 1, 0, "UserInfo");
     qmlRegisterType<BaseResult>("Storage.Model", 1, 0, "BaseResult");
     qmlRegisterType<StorageSourceModel>("Storage.Model", 1, 0, "SourceList");
+    qmlRegisterType<StorageSource>("Storage.Model", 1, 0, "StorageSource");
 
     engine.load("qrc:/qt/qml/storage_delight_compass/DelightUI/App.qml");
 

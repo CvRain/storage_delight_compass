@@ -7,6 +7,7 @@
 
 #include <QObject>
 #include <QStringList>
+#include <QVariant>
 
 #include "storage_source.hpp"
 
@@ -25,7 +26,8 @@ public:
     Q_INVOKABLE void update();
     Q_INVOKABLE void setCurrentIndex(int index);
     Q_INVOKABLE void remove(int index);
-    Q_INVOKABLE void add(const StorageSource& source);
+    Q_INVOKABLE void append(const QVariant& sourceData);
+    void add(const StorageSource& source);
 
 signals:
     void itemsChanged();

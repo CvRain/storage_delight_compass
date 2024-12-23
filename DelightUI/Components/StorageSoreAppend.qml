@@ -7,6 +7,12 @@ Dialog {
     title: "输入参数"
     modal: true
 
+    property alias urlText: urlInput.text
+    property alias nameText: nameInput.text
+    property alias akText: akInput.text
+    property alias skText: skInput.text
+    property alias isHttp: isHttpInput.text
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 10
