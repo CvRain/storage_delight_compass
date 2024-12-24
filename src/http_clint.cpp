@@ -116,9 +116,11 @@ void HttpClient::userInfo() {
         if (responseCode == 200) {
             const auto &groupId = responseData.at(_XPLATSTR("data")).at(_XPLATSTR("group_id")).as_string();
             const auto &role = responseData.at(_XPLATSTR("data")).at(_XPLATSTR("role")).as_number().to_int32();
+            const auto &createTime = responseData.at(_XPLATSTR("data")).at(_XPLATSTR("create_time")).as_number().to_int32();
 
             UserManager::getInstance()->setGroupId(groupId.data());
             UserManager::getInstance()->setRole(role);
+            UserManager::getInstance()->setCreateTime(createTime);
         }
         emit userInfoFetched(responseCode, QString{responseResult.data()}, QString{responseMessage.data()});
     }

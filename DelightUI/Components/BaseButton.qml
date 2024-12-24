@@ -7,6 +7,7 @@ Rectangle{
 
     property alias text: buttonText.text
     property alias textColor: buttonText.color
+    property alias font: buttonText.font
 
     id: root
     width: parent.width / 2

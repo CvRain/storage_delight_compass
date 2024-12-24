@@ -3,6 +3,7 @@
 //
 
 #include "user_info.hpp"
+#include <QDate>
 
 UserInfo::UserInfo(QObject *parent): QObject(parent) {
 }
@@ -27,6 +28,16 @@ int UserInfo::getRole() const {
     return role;
 }
 
+int UserInfo::getCreateTime() const{
+    return createTime;
+}
+
+QString UserInfo::getCreateDate() {
+    const auto dateTime = QDateTime::fromSecsSinceEpoch(createTime);
+    const auto dateString = dateTime.toString("yyyy-MM-dd");
+    return dateString;
+}
+
 void UserInfo::setId(const QString &userId) {
     id = userId;
 }
@@ -45,6 +56,10 @@ void UserInfo::setGroupId(const QString &groupId) {
 
 void UserInfo::setRole(const int role) {
     this->role = role;
+}
+
+void UserInfo::setCreateTime(const int time){
+    this->createTime = time;
 }
 
 UserManager * UserManager::getInstance() {
@@ -89,6 +104,10 @@ void UserManager::setRole(int role) {
     info.setRole(role);
 }
 
+void UserManager::setCreateTime(int time){
+    info.setCreateTime(time);
+}
+
 QString UserManager::getName() const {
     return info.getName();
 }
@@ -99,6 +118,14 @@ QString UserManager::getGroupId() const {
 
 int UserManager::getRole() const {
     return info.getRole();
+}
+
+int UserManager::getCreateTime() const{
+    return info.getCreateTime();
+}
+
+QString UserManager::getCreateDate(){
+    return info.getCreateDate();
 }
 
 UserManager::UserManager(QObject *parent) : QObject(parent){

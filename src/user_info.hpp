@@ -15,6 +15,7 @@ class UserInfo : public QObject {
     Q_PROPERTY(QString token READ getToken WRITE setToken NOTIFY userInfoChanged)
     Q_PROPERTY(QString groupId READ getGroupId WRITE setGroupId NOTIFY userInfoChanged)
     Q_PROPERTY(int role READ getRole WRITE setRole NOTIFY userInfoChanged)
+    Q_PROPERTY(int createTime READ getCreateTime WRITE setCreateTime NOTIFY userInfoChanged)
 
 public:
     explicit UserInfo(QObject *parent = nullptr);
@@ -29,6 +30,10 @@ public:
 
     [[nodiscard]] Q_INVOKABLE int getRole() const;
 
+    [[nodiscard]] Q_INVOKABLE int getCreateTime() const;
+
+    Q_INVOKABLE QString getCreateDate();
+
     Q_INVOKABLE void setId(const QString &userId);
 
     Q_INVOKABLE void setToken(const QString &userToken);
@@ -39,6 +44,8 @@ public:
 
     Q_INVOKABLE void setRole(int role);
 
+    Q_INVOKABLE void setCreateTime(int time);
+
 signals:
     void userInfoChanged();
 
@@ -48,6 +55,7 @@ private:
     QString name;
     QString groupId;
     int role;
+    int createTime;
 };
 
 
@@ -71,6 +79,10 @@ public:
 
     [[nodiscard]] Q_INVOKABLE int getRole() const;
 
+    [[nodiscard]] Q_INVOKABLE int getCreateTime() const;
+
+    [[nodiscard]] Q_INVOKABLE QString getCreateDate();
+
     Q_INVOKABLE void setId(const QString &userId);
 
     Q_INVOKABLE void setToken(const QString &userToken);
@@ -80,6 +92,8 @@ public:
     Q_INVOKABLE void setGroupId(const QString &groupId);
 
     Q_INVOKABLE void setRole(int role);
+
+    Q_INVOKABLE void setCreateTime(int time);
 
 signals:
     void loginStatusChanged(bool status);
