@@ -167,6 +167,8 @@ Rectangle {
         id: membersPage
         Members{
             id: memberPageLoader
+            width: stackView.width
+            height: stackView.height
         }
     }
 

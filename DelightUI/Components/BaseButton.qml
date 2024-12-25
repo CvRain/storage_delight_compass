@@ -10,8 +10,8 @@ Rectangle{
     property alias font: buttonText.font
 
     id: root
-    width: parent.width / 2
-    height: 50
+    implicitWidth: parent.width / 2
+    implicitHeight: 50
     radius: 15
     color:"#bcc0cc"
 
