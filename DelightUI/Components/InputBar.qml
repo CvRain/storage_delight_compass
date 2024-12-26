@@ -5,6 +5,7 @@ Rectangle{
     property color borderColor: "#ccd0da"
     property int textMode: TextInput.Normal
     property alias text: textInput.text
+    property alias echoMode: textInput.echoMode
 
 
     id: root

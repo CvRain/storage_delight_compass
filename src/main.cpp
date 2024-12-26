@@ -5,6 +5,7 @@
 #include "types/result.hpp"
 #include "types/storage_source_model.hpp"
 #include "http_clint.hpp"
+#include "members_model.hpp"
 #include "user_info.hpp"
 #include "types/storage_source.hpp"
 
@@ -30,6 +31,7 @@ int main(int argc, char *argv[]) {
     qmlRegisterType<BaseResult>("Storage.Model", 1, 0, "BaseResult");
     qmlRegisterType<StorageSourceModel>("Storage.Model", 1, 0, "SourceList");
     qmlRegisterType<StorageSource>("Storage.Model", 1, 0, "StorageSource");
+    qmlRegisterType<MembersModel>("Storage.Model", 1, 0, "MembersModel");
 
     engine.load("qrc:/qt/qml/storage_delight_compass/DelightUI/App.qml");
 

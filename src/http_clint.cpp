@@ -277,6 +277,42 @@ CommonResponse HttpClient::removeStorageSource(const std::string& storageId) {
     }
 }
 
+/// <summary>
+/// 获取所有用户信息
+/// <code>
+/// curl --location --request GET 'http://localhost:10492/api/User/info/all'
+/// </code>
+/// </summary>
+QList<UserInfo> HttpClient::userInfoList() {
+    qDebug() << "HttpClient::userInfoList";
+    try {
+        const auto response = client.request(web::http::methods::GET, _XPLATSTR("/User/info/all")).get();
+        const auto responseData = response.extract_json().get();
+        const auto &responseCode = responseData.at(_XPLATSTR("code")).as_number().to_int32();
+        const auto &responseMessage = responseData.at(_XPLATSTR("message")).as_string();
+        const auto &responseResult = responseData.at(_XPLATSTR("result")).as_string();
+        if (responseCode != 200) {
+            emit requestFinish(responseCode, QString{responseResult.data()}, QString{responseMessage.data()});
+            return {};
+        }
+        const auto data = responseData.at(_XPLATSTR("data")).as_array();
+        QList<UserInfo> users;
+        for (const auto& it: data) {
+            UserInfo oneUser;
+            oneUser.setId(it.at(_XPLATSTR("_id")).at(_XPLATSTR("$oid")).as_string().data());
+            oneUser.setCreateTime(it.at(_XPLATSTR("create_time")).as_number().to_int32());
+            oneUser.setGroupId(it.at(_XPLATSTR("group_id")).at(_XPLATSTR("$oid")).as_string().data());
+            oneUser.setName(it.at(_XPLATSTR("name")).as_string().data());
+            oneUser.setRole(it.at(_XPLATSTR("role")).as_number().to_int32());
+            users.append(std::move(oneUser));
+        }
+        return users;
+    }catch (const std::exception &e) {
+        emit requestFailed(QString{e.what()});
+        throw;
+    }
+}
+
 
 HttpClient::HttpClient()
     : baseUrl("http://localhost:10492/api"), client(_XPLATSTR(baseUrl)) {

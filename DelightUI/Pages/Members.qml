@@ -7,6 +7,8 @@ import Storage.Service
 import "../Components"
 
 Rectangle {
+    property Alert alertInstance
+
     id: root
 
     Row {
@@ -60,18 +62,25 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
 
             onClicked: {
+                console.debug("update button clicked!")
                 if (memberListView.currentIndex !== -1) {
                     // 检查是否有选中项
                     let selectedName = memberListView.model.get(
                             memberListView.currentIndex).name
                     console.log("Update Button Clicked. Selected Name:",
                                 selectedName)
-                    // 在这里添加你的更新逻辑，例如发送信号、调用函数等
                 } else {
                     console.log("No item selected.") // 如果没有选中项，则输出提示信息
                 }
+
+                alertInstance.text = "update"
+                alertInstance.level = "info"
+                alertInstance.show()
+                memberUpdate()
             }
         }
+
+
         BaseButton {
             id: addOneButton
             height: 30
@@ -82,6 +91,10 @@ Rectangle {
             font.pixelSize: 18
 
             anchors.verticalCenter: parent.verticalCenter
+
+            onClicked: {
+                memberAdd()
+            }
         }
         BaseButton {
             id: removeButton
@@ -93,6 +106,10 @@ Rectangle {
             font.pixelSize: 18
 
             anchors.verticalCenter: parent.verticalCenter
+
+            onClicked: {
+                memberRemove()
+            }
         }
     }
 
@@ -139,6 +156,22 @@ Rectangle {
                     anchors.leftMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
                 }
+
+                Text {
+                    id: accountId
+                    text: id
+                    color: wrapper.ListView.isCurrentItem ? "white" : "black"
+                    font.pixelSize: 16
+                    font.bold: true
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignRight
+                    font.family: "Ubuntu Mono"
+
+                    anchors.right: parent.right
+                    anchors.rightMargin: 10
+                    anchors.leftMargin: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                }
             }
         }
     }
@@ -150,21 +183,14 @@ Rectangle {
         spacing: 5
 
         delegate: memberInfoDelegate
-        model: ListModel {
-            ListElement {
-                name: "cvrain"
-            }
-            ListElement {
-                name: "test"
-            }
-            ListElement {
-                name: "aaa"
-            }
+        model: MembersModel{
+
         }
 
         onCurrentIndexChanged: {
             if (currentIndex !== -1) {
-                memberIdText.text = model.get(currentIndex).name
+                let id = model.get(currentIndex).id
+                memberIdText.text = id
             } else {
                 memberIdText.text = ""
             }
@@ -173,5 +199,108 @@ Rectangle {
         anchors.top: topLine.bottom
         anchors.topMargin: 15
         anchors.left: topLine.left
+    }
+
+    Component{
+        id: memberRemoveComponent
+        Dialog{
+            id: memberRemoveDialog
+            width: 300
+            height: 150
+            title: qsTr("Remove member")
+            standardButtons: Dialog.Ok | Dialog.Cancel
+            modal: true
+
+            background: Rectangle{
+                width: memberRemoveDialog.width
+                height: memberRemoveDialog.height
+                radius: 5
+            }
+
+            Text{
+                text: qsTr("Are you sure to remove? " + memberListView.model.get(memberListView.currentIndex).name)
+                font.bold: true
+                font.pixelSize: 16
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                anchors.centerIn: parent
+            }
+            anchors.centerIn: parent
+        }
+    }
+
+    Component{
+        id: memberAddComponent
+        Dialog{
+            id: memberAddDialog
+
+            width: 400
+            height: 150
+            title: qsTr("Add member")
+            standardButtons: Dialog.Ok | Dialog.Cancel
+            modal: true
+
+            background: Rectangle{
+                width: memberRemoveDialog.width
+                height: memberRemoveDialog.height
+                color: "white"
+                radius: 5
+            }
+
+            GridLayout{
+                columns: 2
+                columnSpacing: 5
+                rowSpacing: 10
+
+                Text{
+                    id: userNameText
+                    height: 35
+                    text: qsTr("user name")
+                }
+                InputBar{
+                    id: userNameInput
+                    width: parent.width / 2
+                    height: userNameText.height
+                }
+                Text{
+                    id: userPasswordText
+                    height: 35
+                    text: qsTr("user password")
+                }
+                InputBar{
+                    id: userPasswordInput
+                    width: parent.width / 2
+                    height: userPasswordText.height
+                    echoMode: TextInput.Password
+                }
+
+                anchors.fill: parent
+            }
+
+            onAccepted:{
+                var requestBody = {
+                    "name" : userNameInput,
+                    "password": userPasswordInput
+                }
+            }
+
+            anchors.centerIn: parent
+        }
+    }
+
+    function memberUpdate(){
+
+    }
+
+    function memberRemove(){
+        var dialog = memberRemoveComponent.createObject(root)
+        dialog.open()
+        memberUpdate()
+    }
+
+    function memberAdd(){
+        var dialog = memberAddComponent.createObject(root)
+        dialog.open()
+        memberUpdate()
     }
 }

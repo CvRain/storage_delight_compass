@@ -38,6 +38,8 @@ public:
 
     CommonResponse removeStorageSource(const std::string& storageId);
 
+    QList<UserInfo> userInfoList();
+
 signals:
     void requestFailed(const QString &error);
 

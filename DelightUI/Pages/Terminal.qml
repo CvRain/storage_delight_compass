@@ -159,7 +159,9 @@ Rectangle {
     Component{
         id: groupsPage
         Groups{
-            id: groupPageLoader
+            width: stackView.width
+            height: stackView.height
+            alertInstance: alert
         }
     }
 
@@ -169,6 +171,7 @@ Rectangle {
             id: memberPageLoader
             width: stackView.width
             height: stackView.height
+            alertInstance: alert
         }
     }
 

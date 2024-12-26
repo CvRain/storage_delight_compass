@@ -5,7 +5,37 @@
 #include "user_info.hpp"
 #include <QDate>
 
-UserInfo::UserInfo(QObject *parent): QObject(parent) {
+UserInfo::UserInfo(QObject *parent): QObject(parent), role(0), createTime(0) {
+}
+
+UserInfo::UserInfo(UserInfo &&source, QObject *parent)
+    : QObject(parent),
+      id(std::move(source.id)),
+      token(std::move(source.token)),
+      name(std::move(source.name)),
+      groupId(std::move(source.groupId)),
+      role(source.role),
+      createTime(source.createTime) {
+}
+
+UserInfo::UserInfo(const UserInfo &source, QObject *parent)
+    : QObject(parent),
+      id(source.id),
+      token(source.token),
+      name(source.name),
+      groupId(source.groupId),
+      role(source.role),
+      createTime(source.createTime) {
+}
+
+UserInfo & UserInfo::operator=(const UserInfo &source) {
+    id = source.id;
+    token = source.token;
+    name = source.name;
+    groupId = source.groupId;
+    role = source.role;
+    createTime = source.createTime;
+    return *this;
 }
 
 QString UserInfo::getId() const {
@@ -28,7 +58,7 @@ int UserInfo::getRole() const {
     return role;
 }
 
-int UserInfo::getCreateTime() const{
+int UserInfo::getCreateTime() const {
     return createTime;
 }
 
@@ -58,11 +88,11 @@ void UserInfo::setRole(const int role) {
     this->role = role;
 }
 
-void UserInfo::setCreateTime(const int time){
+void UserInfo::setCreateTime(const int time) {
     this->createTime = time;
 }
 
-UserManager * UserManager::getInstance() {
+UserManager* UserManager::getInstance() {
     static auto *instance = new UserManager();
     return instance;
 }
@@ -72,7 +102,7 @@ void UserManager::setLoginStatus(const bool status) {
     emit loginStatusChanged(status);
 }
 
-UserInfo & UserManager::getUserInfo() {
+UserInfo& UserManager::getUserInfo() {
     return this->info;
 }
 
@@ -104,7 +134,7 @@ void UserManager::setRole(int role) {
     info.setRole(role);
 }
 
-void UserManager::setCreateTime(int time){
+void UserManager::setCreateTime(int time) {
     info.setCreateTime(time);
 }
 
@@ -120,13 +150,13 @@ int UserManager::getRole() const {
     return info.getRole();
 }
 
-int UserManager::getCreateTime() const{
+int UserManager::getCreateTime() const {
     return info.getCreateTime();
 }
 
-QString UserManager::getCreateDate(){
+QString UserManager::getCreateDate() {
     return info.getCreateDate();
 }
 
-UserManager::UserManager(QObject *parent) : QObject(parent){
+UserManager::UserManager(QObject *parent) : QObject(parent) {
 }
