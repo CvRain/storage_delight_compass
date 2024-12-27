@@ -63,6 +63,7 @@ Rectangle{
         if(duration !== undefined){
             displayDuration = duration
         }
+        updateAppearance()
         isVisable = true
         hideTimer.start()
         opacityAnimation.from = 0

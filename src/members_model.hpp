@@ -29,7 +29,7 @@ public:
 
     [[nodiscard]] QHash<int, QByteArray> roleNames() const override;
 
-    QModelIndex index(int row, int column, const QModelIndex &parent) const override;
+    [[nodiscard]] QModelIndex index(int row, int column, const QModelIndex &parent) const override;
 
     Q_INVOKABLE void addMember(const QVariant &memberData);
 

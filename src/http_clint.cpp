@@ -313,6 +313,33 @@ QList<UserInfo> HttpClient::userInfoList() {
     }
 }
 
+QString HttpClient::removeUser(const std::string &user_id) {
+    qDebug() << "HttpClient::removeUser";
+    try {
+        web::http::http_request request(web::http::methods::DEL);
+        request.set_request_uri(_XPLATSTR("/User/remove"));
+        request.headers().set_content_type(_XPLATSTR("application/json"));
+
+        web::json::value requestData;
+        requestData[_XPLATSTR("user_id")] = web::json::value::string(user_id);
+        request.set_body(requestData);
+
+        const auto response = client.request(request).get();
+        const auto responseData = response.extract_json().get();
+        const auto &responseCode = responseData.at(_XPLATSTR("code")).as_number().to_int32();
+        const auto &responseMessage = responseData.at(_XPLATSTR("message")).as_string();
+
+        if (responseCode != 200) {
+            emit requestFinish(responseCode, QString{responseMessage.data()}, QString{responseMessage.data()});
+            return {};
+        }
+        return responseData.at(_XPLATSTR("result")).as_string().data();
+    }catch (const std::exception &e) {
+        emit requestFailed(QString{e.what()});
+        throw;
+    }
+}
+
 
 HttpClient::HttpClient()
     : baseUrl("http://localhost:10492/api"), client(_XPLATSTR(baseUrl)) {

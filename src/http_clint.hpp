@@ -40,6 +40,8 @@ public:
 
     QList<UserInfo> userInfoList();
 
+    QString removeUser(const std::string& user_id);
+
 signals:
     void requestFailed(const QString &error);
 

@@ -62,24 +62,9 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
 
             onClicked: {
-                console.debug("update button clicked!")
-                if (memberListView.currentIndex !== -1) {
-                    // 检查是否有选中项
-                    let selectedName = memberListView.model.get(
-                            memberListView.currentIndex).name
-                    console.log("Update Button Clicked. Selected Name:",
-                                selectedName)
-                } else {
-                    console.log("No item selected.") // 如果没有选中项，则输出提示信息
-                }
-
-                alertInstance.text = "update"
-                alertInstance.level = "info"
-                alertInstance.show()
                 memberUpdate()
             }
         }
-
 
         BaseButton {
             id: addOneButton
@@ -183,8 +168,20 @@ Rectangle {
         spacing: 5
 
         delegate: memberInfoDelegate
-        model: MembersModel{
+        model: MembersModel {
+            id: memberModel
 
+            onRequestFailed: {
+                console.debug("member model request failed")
+            }
+
+            onRequestFinish: {
+                console.debug("member model request finish")
+            }
+
+            onMemberUpdated: {
+                members = model.members
+            }
         }
 
         onCurrentIndexChanged: {
@@ -201,9 +198,9 @@ Rectangle {
         anchors.left: topLine.left
     }
 
-    Component{
+    Component {
         id: memberRemoveComponent
-        Dialog{
+        Dialog {
             id: memberRemoveDialog
             width: 300
             height: 150
@@ -211,27 +208,46 @@ Rectangle {
             standardButtons: Dialog.Ok | Dialog.Cancel
             modal: true
 
-            background: Rectangle{
+            background: Rectangle {
                 width: memberRemoveDialog.width
                 height: memberRemoveDialog.height
                 radius: 5
             }
 
-            Text{
-                text: qsTr("Are you sure to remove? " + memberListView.model.get(memberListView.currentIndex).name)
+            anchors.centerIn: parent
+
+            Text {
+                id: tips
+                text: qsTr("Are you sure to remove")
                 font.bold: true
                 font.pixelSize: 16
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 anchors.centerIn: parent
             }
-            anchors.centerIn: parent
+            Text {
+                text: memberListView.model.get(memberListView.currentIndex).name
+                font.bold: true
+                font.pixelSize: 15
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                anchors.top: tips.bottom
+                anchors.topMargin: 10
+                anchors.horizontalCenter: tips.horizontalCenter
+            }
+
+            onAccepted: {
+                let removeId = memberListView.model.get(
+                        memberListView.currentIndex).id
+                console.debug("try to remove: ", removeId)
+                memberListView.model.removeMember(removeId)
+            }
         }
     }
 
-    Component{
+    Component {
         id: memberAddComponent
-        Dialog{
+        Dialog {
             id: memberAddDialog
 
             width: 400
@@ -240,34 +256,34 @@ Rectangle {
             standardButtons: Dialog.Ok | Dialog.Cancel
             modal: true
 
-            background: Rectangle{
-                width: memberRemoveDialog.width
-                height: memberRemoveDialog.height
+            background: Rectangle {
+                width: memberAddDialog.width
+                height: memberAddDialog.height
                 color: "white"
                 radius: 5
             }
 
-            GridLayout{
+            GridLayout {
                 columns: 2
                 columnSpacing: 5
                 rowSpacing: 10
 
-                Text{
+                Text {
                     id: userNameText
                     height: 35
                     text: qsTr("user name")
                 }
-                InputBar{
+                InputBar {
                     id: userNameInput
                     width: parent.width / 2
                     height: userNameText.height
                 }
-                Text{
+                Text {
                     id: userPasswordText
                     height: 35
                     text: qsTr("user password")
                 }
-                InputBar{
+                InputBar {
                     id: userPasswordInput
                     width: parent.width / 2
                     height: userPasswordText.height
@@ -277,30 +293,46 @@ Rectangle {
                 anchors.fill: parent
             }
 
-            onAccepted:{
+            onAccepted: {
                 var requestBody = {
-                    "name" : userNameInput,
-                    "password": userPasswordInput
+                    "name": userNameInput.text,
+                    "password": userPasswordInput.text
                 }
+                memberListView.model.addMember(requestBody)
             }
 
             anchors.centerIn: parent
         }
     }
 
-    function memberUpdate(){
-
+    function memberUpdate() {
+        alertInstance.text = "update"
+        alertInstance.level = "info"
+        alertInstance.show()
+        memberListView.model.update()
     }
 
-    function memberRemove(){
+    function memberRemove() {
+        if (UserManager.getRole() !== 0) {
+            alertInstance.text = qsTr("No permission")
+            alertInstance.level = "error"
+            alertInstance.show()
+            return
+        }
+
         var dialog = memberRemoveComponent.createObject(root)
         dialog.open()
-        memberUpdate()
     }
 
-    function memberAdd(){
+    function memberAdd() {
+        if (UserManager.getRole() !== 0) {
+            alertInstance.text = qsTr("No permission")
+            alertInstance.level = "error"
+            alertInstance.show()
+            return
+        }
+
         var dialog = memberAddComponent.createObject(root)
         dialog.open()
-        memberUpdate()
     }
 }
