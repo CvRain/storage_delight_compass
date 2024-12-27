@@ -320,6 +320,13 @@ Rectangle {
             return
         }
 
+        if(memberListView.model.get(memberListView.currentIndex) === 0){
+            alertInstance.text = qsTr("Can not remove admin account")
+            alertInstance.level = "warn"
+            alertInstance.show()
+            return
+        }
+
         var dialog = memberRemoveComponent.createObject(root)
         dialog.open()
     }
