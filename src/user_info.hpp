@@ -20,7 +20,7 @@ class UserInfo : public QObject {
 public:
     explicit UserInfo(QObject *parent = nullptr);
 
-    UserInfo(UserInfo&& source, QObject *parent = nullptr);
+    UserInfo(UserInfo&& source, QObject *parent = nullptr) noexcept;
 
     UserInfo(const UserInfo& source, QObject *parent = nullptr);
 

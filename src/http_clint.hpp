@@ -9,6 +9,7 @@
 #include <cpprest/http_client.h>
 #include <QObject>
 
+#include "group_info.hpp"
 #include "user_info.hpp"
 #include "types/response.hpp"
 #include "types/result.hpp"
@@ -41,6 +42,10 @@ public:
     QList<UserInfo> userInfoList();
 
     QString removeUser(const std::string& user_id);
+
+    std::optional<GroupInfo> groupInfo();
+
+    std::optional<std::pair<QStringList, QStringList>> groupMemberNames(const QStringList& names);
 
 signals:
     void requestFailed(const QString &error);

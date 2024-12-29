@@ -7,6 +7,7 @@
 
 #include <QObject>
 #include <QList>
+#include <QQmlListProperty>
 
 #include "types/buckets.hpp"
 
@@ -16,7 +17,8 @@ class GroupInfo : public QObject {
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY groupInfoChanged)
     Q_PROPERTY(QList<Bucket> buckets READ getBuckets WRITE setBuckets NOTIFY groupInfoChanged)
     Q_PROPERTY(QList<QString> membersId READ getMembersId NOTIFY groupInfoChanged)
-    Q_PROPERTY(QStringList bucketsNameREAD getBucketsName NOTIFY groupInfoChanged)
+    Q_PROPERTY(QStringList bucketsName READ getBucketsName NOTIFY groupInfoChanged)
+
 public:
     explicit GroupInfo(QObject *parent = nullptr);
 
@@ -26,17 +28,19 @@ public:
 
     GroupInfo& operator=(const GroupInfo &info);
 
-    Q_INVOKABLE QString getId() const;
+    [[nodiscard]] Q_INVOKABLE QString getId() const;
 
-    Q_INVOKABLE QString getName() const;
+    [[nodiscard]] Q_INVOKABLE QString getName() const;
 
-    Q_INVOKABLE QList<Bucket> getBuckets() const;
+    [[nodiscard]] Q_INVOKABLE QList<Bucket> getBuckets() const;
 
-    Q_INVOKABLE Bucket getBucket(int index) const;
+    [[nodiscard]] Q_INVOKABLE Bucket getBucket(int index) const;
 
-    Q_INVOKABLE QList<QString> getMembersId() const;
+    [[nodiscard]] Q_INVOKABLE QStringList getBucketsName() const;
 
-    Q_INVOKABLE QString getMemberId(int index) const;
+    [[nodiscard]] Q_INVOKABLE QList<QString> getMembersId() const;
+
+    [[nodiscard]] Q_INVOKABLE QString getMemberId(int index) const;
 
     Q_INVOKABLE void setId(const QString &id);
 
@@ -54,6 +58,29 @@ private:
     QString name;
     QList<Bucket> buckets;
     QList<QString> membersId;
+};
+
+class GroupInfoManager : public QObject {
+    Q_OBJECT
+
+public:
+    static GroupInfoManager* getInstance();
+
+    Q_INVOKABLE void update();
+
+    Q_INVOKABLE QString getName() const;
+
+    GroupInfo getGroupInfo() const;
+
+signals:
+    void groupInfoChanged();
+
+    void groupError(const QString &error);
+
+private:
+    explicit GroupInfoManager(QObject *parent = nullptr);
+
+    GroupInfo groupInfo;
 };
 
 

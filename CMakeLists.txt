@@ -14,6 +14,8 @@ endif()
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Quick)
 find_package(Qt6 6.5 REQUIRED COMPONENTS WebEngineQuick)
+find_package(Qt6 6.5 REQUIRED COMPONENTS Gui)
+
 find_package(cpprestsdk CONFIG REQUIRED)
 
 qt_standard_project_setup(REQUIRES 6.5)
@@ -33,7 +35,10 @@ set(CPP_SRC src/main.cpp
         src/members_model.hpp
         src/group_info.cpp
         src/group_info.hpp
-        src/types/buckets.hpp)
+        src/types/buckets.hpp
+        src/types/group_model.cpp
+        src/types/group_model.hpp
+        src/utils.hpp)
 
 qt_add_executable(appstorage_delight_compass
         ${CPP_SRC}
@@ -89,7 +94,7 @@ set_target_properties(appstorage_delight_compass PROPERTIES
 )
 
 target_link_libraries(appstorage_delight_compass
-        PRIVATE Qt6::Quick Qt6::Network Qt6::WebEngineQuick
+        PRIVATE Qt6::Quick Qt6::Network Qt6::WebEngineQuick Qt6::Gui
         cpprestsdk::cpprest
         cpprestsdk::cpprestsdk_zlib_internal
         cpprestsdk::cpprestsdk_boost_internal

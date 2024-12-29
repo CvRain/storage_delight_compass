@@ -8,7 +8,7 @@
 UserInfo::UserInfo(QObject *parent): QObject(parent), role(0), createTime(0) {
 }
 
-UserInfo::UserInfo(UserInfo &&source, QObject *parent)
+UserInfo::UserInfo(UserInfo &&source, QObject *parent) noexcept
     : QObject(parent),
       id(std::move(source.id)),
       token(std::move(source.token)),

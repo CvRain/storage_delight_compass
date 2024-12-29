@@ -31,10 +31,23 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
         }
 
-        Text {
+        TextInput {
             id: memberIdText
             font.pixelSize: 18
             font.family: "Ubuntu Mono"
+            readOnly: true
+            width: parent.width
+
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    utils.copyToClipboard(memberIdText.text)
+                    alertInstance.text = "copy success"
+                    alertInstance.level = "success"
+                    alertInstance.show()
+                }
+
+            }
 
             anchors.verticalCenter: parent.verticalCenter
         }
@@ -170,14 +183,6 @@ Rectangle {
         delegate: memberInfoDelegate
         model: MembersModel {
             id: memberModel
-
-            onRequestFailed: {
-                console.debug("member model request failed")
-            }
-
-            onRequestFinish: {
-                console.debug("member model request finish")
-            }
 
             onMemberUpdated: {
                 members = model.members
@@ -341,5 +346,9 @@ Rectangle {
 
         var dialog = memberAddComponent.createObject(root)
         dialog.open()
+    }
+
+    Utils{
+        id: utils
     }
 }

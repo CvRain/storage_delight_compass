@@ -23,14 +23,13 @@ Rectangle {
 
         Text {
             id: membersInfoText
-            text: qsTr("Groups")
             color: "black"
             font.pixelSize: 22
             font.family: "Ubuntu Mono"
+            text: groupListView.model.getName()
 
             anchors.verticalCenter: parent.verticalCenter
         }
-
     }
 
     Row {
@@ -40,13 +39,12 @@ Rectangle {
         spacing: 5
 
         anchors.top: parent.top
-        anchors.topMargin: 15
         anchors.right: topLine.right
 
         BaseButton {
             id: updateButton
             height: 30
-            width: 105
+            width: 120
             text: qsTr("update")
             textColor: "white"
             color: "#dc8a78"
@@ -55,15 +53,14 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
 
             onClicked: {
-
+                memberUpdate()
             }
         }
-
 
         BaseButton {
             id: addOneButton
             height: 30
-            width: 105
+            width: 120
             text: qsTr("add member")
             textColor: "white"
             color: "#dc8a78"
@@ -75,10 +72,11 @@ Rectangle {
                 memberAdd()
             }
         }
+
         BaseButton {
             id: removeButton
             height: 30
-            width: 105
+            width: 120
             text: qsTr("remove member")
             textColor: "white"
             color: "#dc8a78"
@@ -124,19 +122,24 @@ Rectangle {
 
                 Text {
                     id: accountName
-                    text: name
                     color: wrapper.ListView.isCurrentItem ? "white" : "black"
                     font.pixelSize: 16
                     font.bold: true
                     verticalAlignment: Text.AlignVCenter
                     font.family: "Ubuntu Mono"
+                    text: groupListView.model.get(0).id
 
                     anchors.left: parent.left
                     anchors.leftMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
+
                 }
             }
         }
+    }
+
+    GroupModel{
+        id: groupModel
     }
 
     ListView {
@@ -146,34 +149,16 @@ Rectangle {
         spacing: 5
 
         delegate: groupInfoDelegate
-        model: ListModel {
-            ListElement {
-                name: "cvrain"
-            }
-            ListElement {
-                name: "test"
-            }
-            ListElement {
-                name: "aaa"
-            }
-        }
-
-        onCurrentIndexChanged: {
-            if (currentIndex !== -1) {
-                memberIdText.text = model.get(currentIndex).name
-            } else {
-                memberIdText.text = ""
-            }
-        }
+        model: groupModel
 
         anchors.top: topLine.bottom
         anchors.topMargin: 15
         anchors.left: topLine.left
     }
 
-    Component{
+    Component {
         id: groupRemoveComponent
-        Dialog{
+        Dialog {
             id: groupAddDialog
             width: 300
             height: 150
@@ -181,13 +166,13 @@ Rectangle {
             standardButtons: Dialog.Ok | Dialog.Cancel
             modal: true
 
-            background: Rectangle{
+            background: Rectangle {
                 width: groupRemoveComponent.width
                 height: groupRemoveComponent.height
                 radius: 5
             }
 
-            Text{
+            Text {
                 text: qsTr("Are you sure to remove?")
                 font.bold: true
                 font.pixelSize: 16
@@ -199,9 +184,9 @@ Rectangle {
         }
     }
 
-    Component{
+    Component {
         id: groupAddComponent
-        Dialog{
+        Dialog {
             id: memberAddDialog
 
             width: 400
@@ -210,14 +195,14 @@ Rectangle {
             standardButtons: Dialog.Ok | Dialog.Cancel
             modal: true
 
-            background: Rectangle{
+            background: Rectangle {
                 width: memberAddDialog.width
                 height: memberAddDialog.height
                 color: "white"
                 radius: 5
             }
 
-            Text{
+            Text {
                 text: qsTr("Are you sure to add?")
                 font.bold: true
                 font.pixelSize: 16
@@ -226,7 +211,7 @@ Rectangle {
                 anchors.centerIn: parent
             }
 
-            onAccepted:{
+            onAccepted: {
 
             }
 
@@ -234,18 +219,22 @@ Rectangle {
         }
     }
 
-    function memberUpdate(){
-
+    Component.onCompleted: {
+        memberUpdate()
     }
 
-    function memberRemove(){
-        var dialog = groupAddComponent.createObject(root)
+    function memberUpdate() {
+        groupModel.update()
+    }
+
+    function memberRemove() {
+        var dialog = groupRemoveComponent.createObject(root)
         dialog.open()
         memberUpdate()
     }
 
-    function memberAdd(){
-        var dialog = groupRemoveComponent.createObject(root)
+    function memberAdd() {
+        var dialog = groupAddComponent.createObject(root)
         dialog.open()
         memberUpdate()
     }

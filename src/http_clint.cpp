@@ -116,7 +116,8 @@ void HttpClient::userInfo() {
         if (responseCode == 200) {
             const auto &groupId = responseData.at(_XPLATSTR("data")).at(_XPLATSTR("group_id")).as_string();
             const auto &role = responseData.at(_XPLATSTR("data")).at(_XPLATSTR("role")).as_number().to_int32();
-            const auto &createTime = responseData.at(_XPLATSTR("data")).at(_XPLATSTR("create_time")).as_number().to_int32();
+            const auto &createTime = responseData.at(_XPLATSTR("data")).at(_XPLATSTR("create_time")).as_number().
+                    to_int32();
 
             UserManager::getInstance()->setGroupId(groupId.data());
             UserManager::getInstance()->setRole(role);
@@ -244,7 +245,7 @@ CommonResponse HttpClient::addStorageSource(const StorageSource &source) {
 /// }'
 /// </code>
 /// </summary>
-CommonResponse HttpClient::removeStorageSource(const std::string& storageId) {
+CommonResponse HttpClient::removeStorageSource(const std::string &storageId) {
     qDebug() << "HttpClient::removeStorageSource";
 
     const auto userId = UserManager::getInstance()->getId().toStdString();
@@ -297,7 +298,7 @@ QList<UserInfo> HttpClient::userInfoList() {
         }
         const auto data = responseData.at(_XPLATSTR("data")).as_array();
         QList<UserInfo> users;
-        for (const auto& it: data) {
+        for (const auto &it: data) {
             UserInfo oneUser;
             oneUser.setId(it.at(_XPLATSTR("_id")).at(_XPLATSTR("$oid")).as_string().data());
             oneUser.setCreateTime(it.at(_XPLATSTR("create_time")).as_number().to_int32());
@@ -307,7 +308,8 @@ QList<UserInfo> HttpClient::userInfoList() {
             users.append(std::move(oneUser));
         }
         return users;
-    }catch (const std::exception &e) {
+    }
+    catch (const std::exception &e) {
         emit requestFailed(QString{e.what()});
         throw;
     }
@@ -334,7 +336,148 @@ QString HttpClient::removeUser(const std::string &user_id) {
             return {};
         }
         return responseData.at(_XPLATSTR("result")).as_string().data();
-    }catch (const std::exception &e) {
+    }
+    catch (const std::exception &e) {
+        emit requestFailed(QString{e.what()});
+        throw;
+    }
+}
+
+/// <summary>
+/// 获取群组信息
+/// <code>
+/// curl --location --request GET 'http://localhost:10492/api/Group/info' \
+/// --header 'Content-Type: application/json' \
+/// --data-raw '{
+///     "user_id": "67459983948109dbd1079573",
+///     "group_id": "67459983948109dbd1079575"
+/// }'
+/// </code>
+/// </summary>
+std::optional<GroupInfo> HttpClient::groupInfo() {
+    qDebug() << "HttpClient::groupInfo";
+    try {
+        const auto userId = UserManager::getInstance()->getId().toStdString();
+        const auto groupId = UserManager::getInstance()->getGroupId().toStdString();
+
+        web::json::value requestData;
+        requestData[_XPLATSTR("user_id")] = web::json::value::string(userId);
+        requestData[_XPLATSTR("group_id")] = web::json::value::string(groupId);
+        web::http::http_request request(web::http::methods::GET);
+
+        request.set_request_uri(_XPLATSTR("/Group/info"));
+        request.headers().set_content_type(_XPLATSTR("application/json"));
+        request.set_body(requestData);
+
+        const auto response = client.request(request).get();
+        const auto responseData = response.extract_json().get();
+        qDebug() << "HttpClient::groupInfo" << responseData.serialize().data();
+        const auto &responseCode = responseData.at(_XPLATSTR("code")).as_number().to_int32();
+        const auto &responseMessage = responseData.at(_XPLATSTR("message")).as_string();
+        const auto &responseResult = responseData.at(_XPLATSTR("result")).as_string();
+
+        if (responseCode != 200) {
+            emit requestFinish(responseCode, QString{responseResult.data()}, QString{responseMessage.data()});
+            return std::nullopt;
+        }
+
+        const auto &data = responseData.at(_XPLATSTR("data"));
+        const auto &id = data.at(_XPLATSTR("_id")).as_string();
+        const auto &name = data.at(_XPLATSTR("name")).as_string();
+        const auto &buckets = data.at(_XPLATSTR("buckets")).as_array();
+        const auto &membersId = data.at(_XPLATSTR("members_id")).as_array();
+
+        QList<Bucket> bucketsList;
+        for (const auto &it: buckets) {
+            Bucket tempBucket{};
+            tempBucket.bucketName = it.at(_XPLATSTR("bucket_name")).as_string().data();
+            tempBucket.sourceId = it.at(_XPLATSTR("source_id")).as_string().data();
+            qDebug() << "bucketName: " << tempBucket.bucketName << " sourceId: " << tempBucket.sourceId;
+            bucketsList.append(std::move(tempBucket));
+        }
+
+        QList<QString> membersIdList;
+        for (const auto &it: membersId) {
+            qDebug() << "membersId: " << it.as_string().data();
+            membersIdList.append(it.as_string().data());
+        }
+
+        GroupInfo groupInfo{};
+        groupInfo.setId(id.data());
+        groupInfo.setBuckets(bucketsList);
+        groupInfo.setName(name.data());
+        groupInfo.setMembersId(membersIdList);
+
+        return groupInfo;
+    }
+    catch (const std::exception &e) {
+        emit requestFailed(QString{e.what()});
+        throw;
+    }
+}
+
+/// <code>
+/// curl --location --request GET 'http://localhost:10492/api/User/name' \
+/// --header 'Content-Type: application/json' \
+/// --data-raw '{
+///     "user_ids": [
+///         "67459983948109dbd1079573",
+///         "67459983948109dbd1079573"
+///     ]
+/// }'
+/// </code>
+/// 返回
+/// <code>
+/// {
+///     "code": 200,
+///     "data": [{
+///             "id": "67459983948109dbd1079573",
+///             "name": "cvrain" }],
+///     "message": "k200OK",
+///     "result": "ok"
+/// }
+/// </code>
+std::optional<std::pair<QStringList, QStringList>> HttpClient::groupMemberNames(const QStringList &names) {
+    qDebug() << "HttpClient::groupMemberNames";
+    try {
+        web::json::value requestData;
+        requestData[_XPLATSTR("user_ids")] = web::json::value::array();
+        for (int i = 0; i < names.size(); i++) {
+            requestData[_XPLATSTR("user_ids")][i] = web::json::value::string(names.at(i).toStdString());
+        }
+
+        web::http::http_request request(web::http::methods::GET);
+
+        request.set_request_uri(_XPLATSTR("/User/name"));
+        request.headers().set_content_type(_XPLATSTR("application/json"));
+        request.set_body(requestData);
+
+        const auto response = client.request(request).get();
+        const auto responseData = response.extract_json().get();
+        const auto &responseCode = responseData.at(_XPLATSTR("code")).as_number().to_int32();
+        const auto &responseMessage = responseData.at(_XPLATSTR("message")).as_string();
+        const auto &responseResult = responseData.at(_XPLATSTR("result")).as_string();
+
+        if (responseCode != 200) {
+            qDebug() << "HttpClient::groupMemberNames" << responseCode;
+            emit requestFinish(responseCode, QString{responseResult.data()}, QString{responseMessage.data()});
+            return std::nullopt;
+        }
+
+        const auto &data = responseData.at(_XPLATSTR("data")).as_array();
+        QStringList memberNames;
+        for (const auto &it: data) {
+            memberNames.append(QString::fromStdString(it.at(_XPLATSTR("name")).as_string()));
+        }
+        QStringList memberIds;
+        for (const auto &it: data) {
+            memberIds.append(QString::fromStdString(it.at(_XPLATSTR("id")).as_string()));
+        }
+        //debug memberNames and memberIds size;
+        qDebug() << "memberNames size: " << memberNames.size() << " memberIds size: " << memberIds.size();
+        return std::make_pair(std::move(memberIds), std::move(memberNames));
+    }
+    catch (const std::exception &e) {
         emit requestFailed(QString{e.what()});
         throw;
     }
