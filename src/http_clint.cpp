@@ -417,8 +417,8 @@ std::optional<GroupInfo> HttpClient::groupInfo() {
 }
 
 /// <code>
-/// curl --location --request GET 'http://localhost:10492/api/User/name' \
-/// --header 'Content-Type: application/json' \
+/// curl --location --request GET 'http://localhost:10492/api/User/name'
+/// --header 'Content-Type: application/json'
 /// --data-raw '{
 ///     "user_ids": [
 ///         "67459983948109dbd1079573",
@@ -480,6 +480,113 @@ std::optional<std::pair<QStringList, QStringList>> HttpClient::groupMemberNames(
     catch (const std::exception &e) {
         emit requestFailed(QString{e.what()});
         throw;
+    }
+}
+
+/// <summary>
+/// <code>
+/// curl --location --request PATCH 'http://localhost:10492/api/group/members/add'
+/// --header 'Content-Type: application/json'
+/// --data-raw '{
+///     "user_id": "string",
+///     "group_id": "string",
+///     "member_id": [
+///         "string"
+///     ]
+/// }'
+/// </code>
+/// </summary>
+void HttpClient::addMember(const QString &memberId) {
+    qDebug() << "HttpClient::addMember";
+    try {
+        web::json::value requestData;
+        requestData[_XPLATSTR("user_id")] = web::json::value::string(
+            UserManager::getInstance()->getUserInfo().getId().toStdString());
+        qDebug() << "user_id: " << UserManager::getInstance()->getUserInfo().getId();
+
+        requestData[_XPLATSTR("group_id")] = web::json::value::string(
+            GroupInfoManager::getInstance()->getGroupInfo().getId().toStdString());
+
+        requestData[_XPLATSTR("members_id")] = web::json::value::array();
+        requestData[_XPLATSTR("members_id")][0] = web::json::value::string(memberId.toStdString());
+
+        web::http::http_request request(web::http::methods::PATCH);
+        request.set_request_uri(_XPLATSTR("/group/members/add"));
+        request.headers().set_content_type(_XPLATSTR("application/json"));
+        request.set_body(requestData);
+
+        const auto response = client.request(request).get();
+        const auto responseData = response.extract_json().get();
+
+        const auto &responseCode = responseData.at(_XPLATSTR("code")).as_number().to_int32();
+        const auto &responseMessage = responseData.at(_XPLATSTR("message")).as_string();
+        const auto &responseResult = responseData.at(_XPLATSTR("result")).as_string();
+        if (responseCode != 200) {
+            qDebug() << "HttpClient::addMember error " << responseCode;
+            qDebug() << "HttpClient::addMember error " << responseMessage;
+            qDebug() << "HttpClient::addMember error " << responseResult;
+            emit requestFinish(responseCode, QString{responseResult.data()}, QString{responseMessage.data()});
+            return;
+        }
+        emit requestFinish(responseCode, QString{responseResult.data()}, QString{responseMessage.data()});
+    }
+    catch (const std::exception &e) {
+        qDebug() << "HttpClient::addMember exception: " << e.what();
+        emit requestFailed(QString{e.what()});
+    }
+}
+
+/// <summary>
+/// <code>
+/// curl --location --request DELETE 'http://localhost:10492/api/group/members/remove'
+/// --header 'Content-Type: application/json'
+/// --data-raw '{
+///     "user_id": "string",
+///     "group_id": "string",
+///     "members_id": [
+///         "string"
+///     ]
+/// }'
+/// </code>
+/// </summary>
+void HttpClient::removeMember(const QString &memberId) {
+    qDebug() << "HttpClient::removeMember " << memberId;
+    try {
+        web::json::value requestData;
+        requestData[_XPLATSTR("user_id")] = web::json::value::string(
+            UserManager::getInstance()->getUserInfo().getId().toStdString());
+        qDebug() << "user_id: " << UserManager::getInstance()->getUserInfo().getId();
+
+        requestData[_XPLATSTR("group_id")] = web::json::value::string(
+            GroupInfoManager::getInstance()->getGroupInfo().getId().toStdString());
+
+        requestData[_XPLATSTR("members_id")] = web::json::value::array();
+        requestData[_XPLATSTR("members_id")][0] = web::json::value::string(memberId.toStdString());
+
+        web::http::http_request request(web::http::methods::DEL);
+
+        request.set_request_uri(_XPLATSTR("/group/members/remove"));
+        request.headers().set_content_type(_XPLATSTR("application/json"));
+        request.set_body(requestData);
+
+        const auto response = client.request(request).get();
+        const auto responseData = response.extract_json().get();
+        const auto &responseCode = responseData.at(_XPLATSTR("code")).as_number().to_int32();
+        const auto &responseMessage = responseData.at(_XPLATSTR("message")).as_string();
+        const auto &responseResult = responseData.at(_XPLATSTR("result")).as_string();
+
+        if (responseCode != 200) {
+            qDebug() << "HttpClient::removeMember error " << responseCode;
+            qDebug() << "HttpClient::removeMember error" << responseMessage;
+            qDebug() << "HttpClient::removeMember error" << responseResult;
+            emit requestFinish(responseCode, QString{responseResult.data()}, QString{responseMessage.data()});
+            return;
+        }
+        emit requestFinish(responseCode, QString{responseResult.data()}, QString{responseMessage.data()});
+    }
+    catch (const std::exception &e) {
+        qDebug() << "HttpClient::removeMember exception: " << e.what();
+        emit requestFailed(QString{e.what()});
     }
 }
 

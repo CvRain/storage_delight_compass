@@ -47,6 +47,10 @@ public:
 
     std::optional<std::pair<QStringList, QStringList>> groupMemberNames(const QStringList& names);
 
+    void addMember(const QString& memberId);
+
+    void removeMember(const QString& memberId);
+
 signals:
     void requestFailed(const QString &error);
 

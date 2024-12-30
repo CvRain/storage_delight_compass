@@ -122,17 +122,32 @@ Rectangle {
 
                 Text {
                     id: accountName
+                    text: membersName
                     color: wrapper.ListView.isCurrentItem ? "white" : "black"
                     font.pixelSize: 16
                     font.bold: true
                     verticalAlignment: Text.AlignVCenter
                     font.family: "Ubuntu Mono"
-                    text: groupListView.model.get(0).id
 
                     anchors.left: parent.left
                     anchors.leftMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
+                }
 
+                Text {
+                    id: accountId
+                    text: membersId
+                    color: wrapper.ListView.isCurrentItem ? "white" : "black"
+                    font.pixelSize: 16
+                    font.bold: true
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignRight
+                    font.family: "Ubuntu Mono"
+
+                    anchors.right: parent.right
+                    anchors.rightMargin: 10
+                    anchors.leftMargin: 10
+                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
         }
@@ -154,6 +169,10 @@ Rectangle {
         anchors.top: topLine.bottom
         anchors.topMargin: 15
         anchors.left: topLine.left
+
+        onCurrentIndexChanged: {
+            console.debug("current select group member: ", groupListView.model.getId(currentIndex))
+        }
     }
 
     Component {
@@ -165,6 +184,7 @@ Rectangle {
             title: qsTr("Remove member")
             standardButtons: Dialog.Ok | Dialog.Cancel
             modal: true
+            anchors.centerIn: parent
 
             background: Rectangle {
                 width: groupRemoveComponent.width
@@ -173,14 +193,32 @@ Rectangle {
             }
 
             Text {
-                text: qsTr("Are you sure to remove?")
+                id: tips
+                text: qsTr("Are you sure to remove")
                 font.bold: true
                 font.pixelSize: 16
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 anchors.centerIn: parent
             }
-            anchors.centerIn: parent
+
+            Text {
+                text: groupListView.model.getId(groupListView.currentIndex)
+                font.bold: true
+                font.pixelSize: 15
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                anchors.top: tips.bottom
+                anchors.topMargin: 10
+                anchors.horizontalCenter: tips.horizontalCenter
+            }
+
+            onAccepted: {
+                let removeId = groupListView.model.getId(groupListView.currentIndex)
+                console.debug("try to remove",removeId)
+                groupListView.model.removeMember(removeId)
+                memberUpdate()
+            }
         }
     }
 
@@ -202,17 +240,29 @@ Rectangle {
                 radius: 5
             }
 
-            Text {
-                text: qsTr("Are you sure to add?")
-                font.bold: true
-                font.pixelSize: 16
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                anchors.centerIn: parent
+            ColumnLayout{
+                anchors.fill: parent
+                Text {
+                    id: memberAddTip
+                    height: 35
+                    width: parent.width * 0.9
+                    text: qsTr("Input member id")
+                    font.bold: true
+                    font.pixelSize: 16
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                InputBar{
+                    id: memberAddInputBar
+                    height: 35
+                    width: parent.width * 0.9
+                }
             }
 
             onAccepted: {
-
+                groupListView.model.addMember(memberAddInputBar.text);
+                memberUpdate()
             }
 
             anchors.centerIn: parent
@@ -224,18 +274,16 @@ Rectangle {
     }
 
     function memberUpdate() {
-        groupModel.update()
+        groupListView.model.update()
     }
 
     function memberRemove() {
         var dialog = groupRemoveComponent.createObject(root)
         dialog.open()
-        memberUpdate()
     }
 
     function memberAdd() {
         var dialog = groupAddComponent.createObject(root)
         dialog.open()
-        memberUpdate()
     }
 }

@@ -92,3 +92,19 @@ QString GroupModel::getName() {
     qDebug() << "GroupModel::getName" << name;
     return name.isEmpty() ? "unknown" : name;
 }
+
+void GroupModel::addMember(const QString &userId) {
+    qDebug() << "GroupModel::addMember" << userId;
+    GroupInfoManager::addMember(userId);
+    update();
+}
+
+void GroupModel::removeMember(const QString &userId) {
+    qDebug() << "GroupModel::removeMember" << userId;
+    GroupInfoManager::removeMember(userId);
+    update();
+}
+
+QString GroupModel::getId(const int index) const {
+    return membersId.at(index);
+}

@@ -49,7 +49,6 @@ public:
     Q_INVOKABLE void setBuckets(const QList<Bucket> &buckets);
 
     Q_INVOKABLE void setMembersId(const QList<QString> &membersId);
-
 signals:
     void groupInfoChanged();
 
@@ -71,6 +70,10 @@ public:
     Q_INVOKABLE QString getName() const;
 
     GroupInfo getGroupInfo() const;
+
+    Q_INVOKABLE static void addMember(const QString& memberId);
+
+    Q_INVOKABLE static void removeMember(const QString& memberId);
 
 signals:
     void groupInfoChanged();

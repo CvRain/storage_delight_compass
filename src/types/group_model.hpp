@@ -36,6 +36,11 @@ public:
 
     Q_INVOKABLE static QString getName();
 
+    Q_INVOKABLE void addMember(const QString &userId);
+
+    Q_INVOKABLE void removeMember(const QString &userId);
+
+    [[nodiscard]] Q_INVOKABLE QString getId(int index) const;
 private:
     QStringList membersId{};
     QStringList membersName{};

@@ -101,6 +101,14 @@ GroupInfo GroupInfoManager::getGroupInfo() const {
     return groupInfo;
 }
 
+void GroupInfoManager::addMember(const QString &memberId) {
+    HttpClient::getInstance()->addMember(memberId);
+}
+
+void GroupInfoManager::removeMember(const QString &memberId) {
+    HttpClient::getInstance()->removeMember(memberId);
+}
+
 
 GroupInfoManager::GroupInfoManager(QObject *parent) : QObject(parent) {
     qDebug() << "GroupInfoManager::GroupInfoManager()";
