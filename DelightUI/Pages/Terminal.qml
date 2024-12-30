@@ -138,7 +138,7 @@ Rectangle {
         anchors.top: topbar.bottom
         anchors.left: sideBar.right
 
-        initialItem: consolePage
+        initialItem: objectBrowerPage
     }
 
     Component{

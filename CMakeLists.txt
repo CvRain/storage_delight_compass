@@ -38,7 +38,10 @@ set(CPP_SRC src/main.cpp
         src/types/buckets.hpp
         src/types/group_model.cpp
         src/types/group_model.hpp
-        src/utils.hpp)
+        src/utils.hpp
+        src/types/group_list_model.cpp
+        src/types/group_list_model.hpp
+        src/types/buckets.cpp)
 
 qt_add_executable(appstorage_delight_compass
         ${CPP_SRC}
@@ -55,7 +58,9 @@ set(QML_PAGES ${PAGE_QML_PATH}/Login.qml
         ${PAGE_QML_PATH}/ObjectBrowser.qml
         ${PAGE_QML_PATH}/Groups.qml
         ${PAGE_QML_PATH}/Members.qml
-        ${PAGE_QML_PATH}/Personal.qml)
+        ${PAGE_QML_PATH}/Personal.qml
+        ${PAGE_QML_PATH}/ObjectPage.qml
+        ${PAGE_QML_PATH}/BucketPage.qml)
 
 set(QML_COMPONENTS
         ${COMPONENT_QML_PATH}/Card.qml

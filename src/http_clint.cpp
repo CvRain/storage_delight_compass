@@ -590,6 +590,66 @@ void HttpClient::removeMember(const QString &memberId) {
     }
 }
 
+/// <summary>
+/// <code>curl --location --request GET 'http://localhost:10492/api/Group/all'</code>
+/// </summary>
+QList<GroupInfo> HttpClient::allGroupInfo() {
+    qDebug() << "HttpClient::allGroupInfo";
+    try {
+        web::http::http_request request(web::http::methods::GET);
+        request.set_request_uri(_XPLATSTR("/group/all"));
+        const auto response = client.request(request).get();
+
+        const auto responseData = response.extract_json().get();
+        const auto &responseCode = responseData.at(_XPLATSTR("code")).as_number().to_int32();
+        const auto &responseMessage = responseData.at(_XPLATSTR("message")).as_string();
+        const auto &responseResult = responseData.at(_XPLATSTR("result")).as_string();
+
+        if (responseCode != 200) {
+            qDebug() << "HttpClient::allGroupInfo error " << responseCode;
+            qDebug() << "HttpClient::allGroupInfo error " << responseMessage;
+            qDebug() << "HttpClient::allGroupInfo error " << responseResult;
+            return {};
+        }
+
+        const auto& resultData = responseData.at(_XPLATSTR("data")).as_array();
+        QList<GroupInfo> groupInfoList;
+        for (const auto& data : resultData) {
+            const auto& id = data.at(_XPLATSTR("_id")).as_string();
+            const auto& buckets = data.at(_XPLATSTR("buckets")).as_array();
+            const auto& members = data.at(_XPLATSTR("members_id")).as_array();
+            const auto& ownerId = data.at(_XPLATSTR("owner_id")).as_string();
+            const auto& name = data.at(_XPLATSTR("name")).as_string();
+
+            QList<Bucket> bucketList;
+            for (const auto& bucket : buckets) {
+                bucketList.append(Bucket{
+                    QString::fromStdString(bucket.at(_XPLATSTR("bucket_name")).as_string()),
+                    QString::fromStdString(bucket.at(_XPLATSTR("source_id")).as_string())
+                });
+            }
+
+            QList<QString> membersId;
+            for (const auto& member : members) {
+                membersId.append(QString::fromStdString(member.as_string()));
+            }
+
+            GroupInfo groupInfo;
+            groupInfo.setId(QString::fromStdString(id));
+            groupInfo.setBuckets(bucketList);
+            groupInfo.setMembersId(membersId);
+            groupInfo.setOwnerId(QString::fromStdString(ownerId));
+            groupInfo.setName(QString::fromStdString(name));
+            groupInfoList.append(groupInfo);
+        }
+        return groupInfoList;
+    }catch (const std::exception &e) {
+        qDebug() << "HttpClient::allGroupInfo exception: " << e.what();
+        emit requestFailed(QString{e.what()});
+        return {};
+    }
+}
+
 
 HttpClient::HttpClient()
     : baseUrl("http://localhost:10492/api"), client(_XPLATSTR(baseUrl)) {

@@ -9,16 +9,17 @@
 #include "http_clint.hpp"
 
 GroupInfo::GroupInfo(QObject *parent)
-    : id{}, name{}, buckets{}, membersId{} {
+    : QObject(parent), id{}, name{}, ownerId{}, buckets{}, membersId{} {
 }
 
 GroupInfo::GroupInfo(const GroupInfo &info, QObject *parent)
-    : QObject{parent}, id{info.id}, name{info.name}, buckets{info.buckets}, membersId{info.membersId} {
+    : QObject{parent}, id{info.id}, name{info.name}, ownerId{info.ownerId}, buckets{info.buckets},
+      membersId{info.membersId} {
 }
 
 GroupInfo::GroupInfo(GroupInfo &&info, QObject *parent) noexcept
-    : QObject{parent}, id{std::move(info.id)}, name{std::move(info.name)}, buckets{std::move(info.buckets)},
-      membersId{std::move(info.membersId)} {
+    : QObject{parent}, id{std::move(info.id)}, name{std::move(info.name)}, ownerId{std::move(info.ownerId)},
+      buckets{std::move(info.buckets)}, membersId{std::move(info.membersId)} {
 }
 
 GroupInfo& GroupInfo::operator=(const GroupInfo &info) {
@@ -26,6 +27,7 @@ GroupInfo& GroupInfo::operator=(const GroupInfo &info) {
     name = info.name;
     buckets = info.buckets;
     membersId = info.membersId;
+    ownerId = info.ownerId;
     return *this;
 }
 
@@ -61,6 +63,10 @@ QString GroupInfo::getMemberId(const int index) const {
     return membersId[index];
 }
 
+QString GroupInfo::getOwnerId() const {
+    return ownerId;
+}
+
 void GroupInfo::setId(const QString &id) {
     this->id = id;
 }
@@ -75,6 +81,10 @@ void GroupInfo::setBuckets(const QList<Bucket> &buckets) {
 
 void GroupInfo::setMembersId(const QList<QString> &membersId) {
     this->membersId = membersId;
+}
+
+void GroupInfo::setOwnerId(const QString &ownerId) {
+    this->ownerId = ownerId;
 }
 
 GroupInfoManager* GroupInfoManager::getInstance() {

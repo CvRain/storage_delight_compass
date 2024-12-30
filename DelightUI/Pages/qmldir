@@ -9,3 +9,5 @@ ObjectBrowser 1.0 ObjectBrowser.qml
 Groups 1.0  Groups.qml
 Members 1.0 Members.qml
 Personal 1.0 Personal.qml
+Object 1.0 ObjectPage.qml
+BucketPage 1.0 BucketPage.qml

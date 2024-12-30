@@ -51,6 +51,8 @@ public:
 
     void removeMember(const QString& memberId);
 
+    QList<GroupInfo> allGroupInfo();
+
 signals:
     void requestFailed(const QString &error);
 

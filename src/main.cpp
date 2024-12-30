@@ -9,6 +9,7 @@
 #include "members_model.hpp"
 #include "user_info.hpp"
 #include "utils.hpp"
+#include "types/group_list_model.hpp"
 #include "types/group_model.hpp"
 #include "types/storage_source.hpp"
 
@@ -38,7 +39,9 @@ int main(int argc, char *argv[]) {
     qmlRegisterType<MembersModel>("Storage.Model", 1, 0, "MembersModel");
     qmlRegisterType<GroupInfo>("Storage.Model", 1, 0, "GroupInfo");
     qmlRegisterType<GroupModel>("Storage.Model", 1, 0, "GroupModel");
+    qmlRegisterType<GroupListModel>("Storage.Model", 1, 0, "GroupListModel");
     qmlRegisterType<Utils>("Storage.Model", 1, 0, "Utils");
+    qmlRegisterType<Bucket>("Storage.Model", 1, 0, "Bucket");
 
     engine.load("qrc:/qt/qml/storage_delight_compass/DelightUI/App.qml");
 

@@ -21,40 +21,29 @@ class GroupInfo : public QObject {
 
 public:
     explicit GroupInfo(QObject *parent = nullptr);
-
     GroupInfo(const GroupInfo &info, QObject *parent = nullptr);
-
     GroupInfo(GroupInfo &&info, QObject *parent = nullptr) noexcept;
-
     GroupInfo& operator=(const GroupInfo &info);
-
     [[nodiscard]] Q_INVOKABLE QString getId() const;
-
     [[nodiscard]] Q_INVOKABLE QString getName() const;
-
     [[nodiscard]] Q_INVOKABLE QList<Bucket> getBuckets() const;
-
     [[nodiscard]] Q_INVOKABLE Bucket getBucket(int index) const;
-
     [[nodiscard]] Q_INVOKABLE QStringList getBucketsName() const;
-
     [[nodiscard]] Q_INVOKABLE QList<QString> getMembersId() const;
-
     [[nodiscard]] Q_INVOKABLE QString getMemberId(int index) const;
-
+    [[nodiscard]] Q_INVOKABLE QString getOwnerId() const;
     Q_INVOKABLE void setId(const QString &id);
-
     Q_INVOKABLE void setName(const QString &name);
-
     Q_INVOKABLE void setBuckets(const QList<Bucket> &buckets);
-
     Q_INVOKABLE void setMembersId(const QList<QString> &membersId);
+    Q_INVOKABLE void setOwnerId(const QString &ownerId);
 signals:
     void groupInfoChanged();
 
 private:
     QString id;
     QString name;
+    QString ownerId;
     QList<Bucket> buckets;
     QList<QString> membersId;
 };
