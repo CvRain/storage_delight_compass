@@ -7,6 +7,7 @@ import "../Components"
 
 Rectangle {
     property Alert alertInstance
+    property int selectGroup
 
     id: root
 
@@ -32,7 +33,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
 
             onClicked: {
-                if(stackView.depth !== 1){
+                if (stackView.depth !== 1) {
                     stackView.pop()
                 }
             }
@@ -59,64 +60,87 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
-    GroupListModel{
+    GroupListModel {
         id: groupListModel
     }
 
     Component {
-        id: groupInfoDelegate
-        Item {
-            id: wrapper
-            width: root.width * 0.8
-            height: 45
+        id: firstPage
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: wrapper.ListView.view.currentIndex = index
+        Item{
+            ListView {
+                id: firstPageListView
+                width: topLine.width
+                height: parent.height - topBarLeft.height - 20
+                spacing: 5
+
+                model: groupListModel
+                delegate: groupInfoDelegate
+
+                onCurrentIndexChanged: {
+                    selectGroup = currentIndex
+                }
             }
 
-            Rectangle {
-                border.color: "#f2d5cf"
-                border.width: 2
-                radius: 15
+            Component {
+                id: groupInfoDelegate
+                Item {
+                    id: wrapper
+                    width: root.width * 0.8
+                    height: 45
 
-                anchors.fill: parent
-                color: wrapper.ListView.isCurrentItem ? "#f2d5cf" : "transparent"
 
-                Text {
-                    id: accountName
-                    text: name
-                    color: wrapper.ListView.isCurrentItem ? "white" : "black"
-                    font.pixelSize: 16
-                    font.bold: true
-                    verticalAlignment: Text.AlignVCenter
-                    font.family: "Ubuntu Mono"
-
-                    anchors.left: parent.left
-                    anchors.leftMargin: 10
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                Text {
-                    id: accountId
-                    text: owner
-                    color: wrapper.ListView.isCurrentItem ? "white" : "black"
-                    font.pixelSize: 16
-                    font.bold: true
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignRight
-                    font.family: "Ubuntu Mono"
-
-                    anchors.right: parent.right
-                    anchors.rightMargin: 10
-                    anchors.leftMargin: 10
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    MouseArea{
+                    MouseArea {
                         anchors.fill: parent
+                        onClicked: wrapper.ListView.view.currentIndex = index
+                    }
 
-                        onDoubleClicked: {
-                            console.debug("selected ", firstPageListView.model.get(firstPageListView.currentIndex).owner)
+                    Rectangle {
+                        border.color: "#f2d5cf"
+                        border.width: 2
+                        radius: 15
+
+                        anchors.fill: parent
+                        color: wrapper.ListView.isCurrentItem ? "#f2d5cf" : "transparent"
+
+                        Text {
+                            id: accountName
+                            text: name
+                            color: wrapper.ListView.isCurrentItem ? "white" : "black"
+                            font.pixelSize: 16
+                            font.bold: true
+                            verticalAlignment: Text.AlignVCenter
+                            font.family: "Ubuntu Mono"
+
+                            anchors.left: parent.left
+                            anchors.leftMargin: 10
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Text {
+                            id: accountId
+                            text: owner
+                            color: wrapper.ListView.isCurrentItem ? "white" : "black"
+                            font.pixelSize: 16
+                            font.bold: true
+                            verticalAlignment: Text.AlignVCenter
+                            horizontalAlignment: Text.AlignRight
+                            font.family: "Ubuntu Mono"
+
+                            anchors.right: parent.right
+                            anchors.rightMargin: 10
+                            anchors.leftMargin: 10
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            MouseArea {
+                                anchors.fill: parent
+
+                                onDoubleClicked: {
+                                    console.log("Double-clicked item:",
+                                                firstPageListView.currentIndex)
+                                    stackView.push(bucketPage)
+                                }
+                            }
                         }
                     }
                 }
@@ -124,36 +148,20 @@ Rectangle {
         }
     }
 
-    Component{
-        id: firstPage
-
-        ListView{
-            id: firstPageListView
-            width: topLine.width
-            height: parent.height - topBarLeft.height - 20
-            spacing: 5
-
-            model: groupListModel
-            delegate: groupInfoDelegate
-        }
-    }
-
-    Component{
+    Component {
         id: bucketPage
-        BucketPage{
-
+        BucketPage {
+            bucketIndex: selectGroup
+            groupModel: groupListModel
         }
-
     }
 
-    Component{
+    Component {
         id: objectPage
-        ObjectPage{
-
-        }
+        ObjectPage {}
     }
 
-    StackView{
+    StackView {
         id: stackView
         width: topLine.width
         height: parent.height - topBarLeft.height - 20

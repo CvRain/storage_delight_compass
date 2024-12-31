@@ -6,6 +6,7 @@
 #define GROUP_LIST_MODEL_HPP
 
 #include <QAbstractListModel>
+#include <QList>
 
 #include "src/group_info.hpp"
 
@@ -24,9 +25,9 @@ public:
     [[nodiscard]] Q_INVOKABLE int rowCount(const QModelIndex &parent) const override;
     [[nodiscard]] QModelIndex index(int row, int column, const QModelIndex &parent) const override;
     [[nodiscard]] Q_INVOKABLE QVariantMap get(int index) const;
+    [[nodiscard]] Q_INVOKABLE QVariantList getGroupMembers(int index) const;
+    [[nodiscard]] Q_INVOKABLE QList<Bucket> getBuckets(int index) const;
     Q_INVOKABLE void update();
-    Q_INVOKABLE QVariantList getGroupMembers(int index) const;
-    Q_INVOKABLE BucketListModel getBucketsModel(int index) const;
 private:
     QList<GroupInfo> groupList;
 };

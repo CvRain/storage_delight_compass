@@ -21,7 +21,9 @@ QString BucketListModel::getBucketName(const int index) const {
 }
 
 void BucketListModel::setBuckets(const QList<Bucket> &buckets) {
+    beginResetModel();
     this->buckets = buckets;
+    endResetModel();
 }
 
 QHash<int, QByteArray> BucketListModel::roleNames() const {
@@ -47,4 +49,9 @@ QVariant BucketListModel::data(const QModelIndex &index, int role) const {
         default:
             return {};
     }
+}
+
+int BucketListModel::length() const
+{
+    return static_cast<int>(buckets.size());
 }

@@ -1,12 +1,14 @@
 import QtQuick
 import QtQuick.Controls
 import QtWebEngine
+import QtCore
 import Storage.Model
 import Storage.Service
 import "../Components"
 
 Item {
     property Alert alertInstance
+    property string savePath: ""
 
     id: root
     anchors.fill: parent
@@ -88,11 +90,11 @@ Item {
                 radius: 5
                 color: combox.checkedColor
 
-                Connections{
+                Connections {
                     target: addItemButton
-                    function onClicked(){
+                    function onClicked() {
                         console.debug("User role ", UserManager.getRole())
-                        if (UserManager.getRole() !== 0 ) {
+                        if (UserManager.getRole() !== 0) {
                             alertInstance.text = qsTr("No permission")
                             alertInstance.level = "warn"
                             alertInstance.show()
@@ -158,6 +160,63 @@ Item {
         height: parent.height - bar.height
         anchors.top: bar.bottom
         anchors.left: bar.left
+
+        profile: WebEngineProfile {
+            id: webprofile
+
+            onDownloadRequested: function (downloadItem) {
+                //当触发下载时，onDownloadRequested 事件会被调用，接收 WebEngineDownloadItem 对象来管理下载过程。
+                console.log("Download requested: ", downloadItem.url)
+                // 使用 FileDialog 让用户选择文件路径
+                // folderDialog.open();
+
+                //设置下载路径,会获取电脑标准的下载路径进行拼接
+                var customSavePath = StandardPaths.writableLocation(
+                            StandardPaths.DownloadLocation).toString().replace(
+                            "file:///", "")
+                ;
+                savePath = customSavePath
+                console.log("Custom save path: ", customSavePath)
+                console.log("downloadDirectory path: ",
+                            downloadItem.downloadDirectory)
+                downloadItem.downloadDirectory = customSavePath
+                console.log("downloadDirectory path: ",
+                            downloadItem.downloadDirectory)
+                downloadItem.accept()
+            }
+
+            onDownloadFinished: function (downloadItem) {
+                if (downloadItem.state === WebEngineDownloadRequest.DownloadCancelled) {
+                    console.log("下载成功 ")
+                    dialogText.text = "下载成功,地址为:" + savePath
+                    downloadCompleteDialog.open()
+                } else if (downloadItem.state === WebEngineDownloadRequest.DownloadCancelled) {
+                    console.log("下载失败")
+                }
+
+            }
+        }
+    }
+
+    Dialog {
+        id: downloadCompleteDialog
+        title: "下载通知"
+        standardButtons: Dialog.Ok
+        anchors.centerIn: parent
+        property var downloadItem: null
+        onAccepted: {
+            console.log("Dialog accepted")
+        }
+        onRejected: {
+            console.log("Dialog closed")
+        }
+
+        Text {
+            id: dialogText
+            anchors.margins: 10
+            anchors.fill: parent
+            text: "下载信息将在这里显示"
+        }
     }
 
     SourceList {

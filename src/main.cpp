@@ -42,6 +42,7 @@ int main(int argc, char *argv[]) {
     qmlRegisterType<GroupListModel>("Storage.Model", 1, 0, "GroupListModel");
     qmlRegisterType<Utils>("Storage.Model", 1, 0, "Utils");
     qmlRegisterType<Bucket>("Storage.Model", 1, 0, "Bucket");
+    qmlRegisterType<BucketListModel>("Storage.Model", 1, 0, "BucketListModel");
 
     engine.load("qrc:/qt/qml/storage_delight_compass/DelightUI/App.qml");
 

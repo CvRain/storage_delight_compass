@@ -624,8 +624,8 @@ QList<GroupInfo> HttpClient::allGroupInfo() {
             QList<Bucket> bucketList;
             for (const auto& bucket : buckets) {
                 bucketList.append(Bucket{
-                    QString::fromStdString(bucket.at(_XPLATSTR("bucket_name")).as_string()),
-                    QString::fromStdString(bucket.at(_XPLATSTR("source_id")).as_string())
+                    .sourceId = QString::fromStdString(bucket.at(_XPLATSTR("source_id")).as_string()),
+                    .bucketName =  QString::fromStdString(bucket.at(_XPLATSTR("bucket_name")).as_string()),
                 });
             }
 

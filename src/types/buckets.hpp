@@ -41,19 +41,13 @@ public:
     }
 
     [[nodiscard]] Q_INVOKABLE QList<Bucket> getBuckets() const;
-
     [[nodiscard]] Q_INVOKABLE Bucket getBucket(int index) const;
-
     [[nodiscard]] Q_INVOKABLE QString getSourceId(int index) const;
-
     [[nodiscard]] Q_INVOKABLE QString getBucketName(int index) const;
-
     [[nodiscard]] QHash<int, QByteArray> roleNames() const override;
-
     [[nodiscard]] int rowCount(const QModelIndex &parent) const override;
-
     [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
-
+    [[nodiscard]] int length() const;
     Q_INVOKABLE void setBuckets(const QList<Bucket> &buckets);
 
 private:

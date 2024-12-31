@@ -41,7 +41,9 @@ set(CPP_SRC src/main.cpp
         src/utils.hpp
         src/types/group_list_model.cpp
         src/types/group_list_model.hpp
-        src/types/buckets.cpp)
+        src/types/buckets.cpp
+        src/types/object_model.cpp
+        src/types/object_model.hpp)
 
 qt_add_executable(appstorage_delight_compass
         ${CPP_SRC}

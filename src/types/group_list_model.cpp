@@ -13,7 +13,7 @@ GroupListModel::GroupListModel(QObject *parent): QAbstractListModel(parent) {
 
 QVariant GroupListModel::data(const QModelIndex &index, const int role) const {
     if (!index.isValid()) {
-        return QVariant();
+        return {};
     }
     switch (role) {
         case IdRole:
@@ -65,14 +65,21 @@ void GroupListModel::update() {
 
 QVariantList GroupListModel::getGroupMembers(const int index) const {
     if (index < 0 || index >= groupList.size()) {
-        return QVariantList();
+        return {};
     }
     const auto &members = groupList.at(index).getMembersId();
-    return QVariantList(members.begin(), members.end());
+    QVariantList memberList;
+    std::ranges::transform(members, std::back_inserter(memberList), [](const auto &member) {
+        return QVariant(member);
+    });
+    return memberList;
 }
 
-BucketListModel GroupListModel::getBucketsModel(const int index) const {
-    BucketListModel model;
-    model.setBuckets(groupList.at(index).getBuckets());
-    return model;
+QList<Bucket> GroupListModel::getBuckets(const int index) const {
+    const auto& buckets =  groupList.at(index).getBuckets();
+    for (const auto&[sourceId, bucketName] : buckets) {
+        qDebug() << "name: " << bucketName;
+        qDebug() << "sourceId: " << sourceId;
+    }
+    return buckets;
 }
