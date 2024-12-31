@@ -79,6 +79,23 @@ QString ObjectModel::getSourceId() const {
     return sourceId;
 }
 
+QString ObjectModel::getObjectName(const int index) const {
+    if (index < 0 || index >= objects.size()) {
+        return {};
+    }
+    return objects.at(index).name;
+}
+
+QVariantMap ObjectModel::get(const int index) const {
+    return {
+            {"etag", objects.at(index).etag},
+            {"lastModified", objects.at(index).lastModified},
+            {"name", objects.at(index).name},
+            {"size", objects.at(index).size},
+            {"versionId", objects.at(index).versionId}
+    };
+}
+
 void ObjectModel::setObjects(const QList<OneObject> &objects) {
     beginResetModel();
     this->objects = objects;
@@ -86,6 +103,7 @@ void ObjectModel::setObjects(const QList<OneObject> &objects) {
 }
 
 void ObjectModel::update() {
+    qDebug() << "ObjectModel::update";
     const auto result = HttpClient::getInstance()->getObjects(bucketName.toStdString(), sourceId.toStdString());
     setObjects(result);
 }

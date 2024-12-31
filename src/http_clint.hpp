@@ -56,6 +56,12 @@ public:
 
     QList<OneObject> getObjects(const std::string& bucketName, const std::string& sourceId);
 
+    Q_INVOKABLE void objectDownload(const QString &objectName, const QString &bucketName, const QString &sourceId);
+
+    Q_INVOKABLE void objectUpload(const QString &filePath, const QString &bucketName, const QString &sourceId);
+
+    Q_INVOKABLE void objectRemove(const QString &objectName, const QString &bucketName, const QString &sourceId);
+
 signals:
     void requestFailed(const QString &error);
 
@@ -66,6 +72,12 @@ signals:
     void userRegistered(int code, const QString &result, const QString &message);
 
     void userInfoFetched(int code, const QString &result, const QString &message);
+
+    void objectDownloadFinish();
+
+    void objectUploadFinish();
+
+    void objectRemoveFinish();
 
 private:
     explicit HttpClient();

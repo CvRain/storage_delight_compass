@@ -37,7 +37,11 @@ Rectangle {
             onClicked: {
                 if (stackView.depth !== 1) {
                     stackView.pop()
+                    return
                 }
+                alertInstance.text = qsTr("you are in the root path")
+                alertInstance.level = "info"
+                alertInstance.show()
             }
         }
 
@@ -69,7 +73,7 @@ Rectangle {
     Component {
         id: firstPage
 
-        Item{
+        Item {
             ListView {
                 id: firstPageListView
                 width: topLine.width
@@ -90,7 +94,6 @@ Rectangle {
                     id: wrapper
                     width: root.width * 0.8
                     height: 45
-
 
                     MouseArea {
                         anchors.fill: parent
@@ -138,9 +141,24 @@ Rectangle {
                                 anchors.fill: parent
 
                                 onDoubleClicked: {
-                                    console.log("Double-clicked item:",
-                                                firstPageListView.currentIndex)
-                                    stackView.push(bucketPage)
+                                    enterBucket()
+                                }
+
+                                function enterBucket() {
+                                    let currentIndex = firstPageListView.currentIndex
+                                    console.log("enter item:", currentIndex)
+
+                                    if (groupListModel.isOwner(currentIndex)
+                                            || groupListModel.isMember(
+                                                currentIndex)) {
+                                        stackView.push(bucketPage)
+                                        return
+                                    }
+
+                                    alertInstance.text = qsTr(
+                                                "you are not owner nor memebr in this group")
+                                    alertInstance.level = "warn"
+                                    alertInstance.show()
                                 }
                             }
                         }
@@ -156,13 +174,12 @@ Rectangle {
             bucketIndex: selectGroup
             groupModel: groupListModel
 
-            onBucketSelected: function(bucketName, sourceId){
+            onBucketSelected: function (bucketName, sourceId) {
                 currentBucketName = bucketName
                 currentSourceId = sourceId
                 console.debug("push objcetPage")
                 console.debug("bucketName ", bucketName)
                 console.debug("sourceId ", sourceId)
-
 
                 var newObjectPage = objectPage.createObject(stackView)
                 newObjectPage.initialized(bucketName, sourceId)
@@ -176,6 +193,7 @@ Rectangle {
         ObjectPage {
             bucketName: currentBucketName
             sourceId: currentSourceId
+            alertInstance: root.alertInstance
         }
     }
 

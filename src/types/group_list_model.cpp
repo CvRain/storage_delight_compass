@@ -63,6 +63,22 @@ void GroupListModel::update() {
     endResetModel();
 }
 
+bool GroupListModel::isOwner(const int index) const {
+    if (index < 0 || index >= groupList.size()) {
+        return false;
+    }
+    const auto& currentGroup = groupList.at(index);
+    return currentGroup.getOwnerId() == UserManager::getInstance()->getId();
+}
+
+bool GroupListModel::isMember(const int index) const {
+    if (index < 0 || index >= groupList.size()) {
+        return false;
+    }
+    const auto& currentGroup = groupList.at(index);
+    return currentGroup.getMembersId().contains(UserManager::getInstance()->getId());
+}
+
 QVariantList GroupListModel::getGroupMembers(const int index) const {
     if (index < 0 || index >= groupList.size()) {
         return {};

@@ -153,6 +153,7 @@ Rectangle {
         id: objectBrowerPage
         ObjectBrowser{
             id: objectBrowserPageLoader
+            alertInstance: alert
         }
     }
 

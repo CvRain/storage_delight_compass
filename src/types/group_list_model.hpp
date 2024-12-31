@@ -28,6 +28,8 @@ public:
     [[nodiscard]] Q_INVOKABLE QVariantList getGroupMembers(int index) const;
     [[nodiscard]] Q_INVOKABLE QList<Bucket> getBuckets(int index) const;
     Q_INVOKABLE void update();
+    Q_INVOKABLE bool isOwner(int index) const;
+    Q_INVOKABLE bool isMember(int index) const;
 private:
     QList<GroupInfo> groupList;
 };

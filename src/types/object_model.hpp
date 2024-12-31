@@ -44,6 +44,8 @@ public:
     [[nodiscard]] Q_INVOKABLE QModelIndex index(int row, int column, const QModelIndex &parent) const override;
     [[nodiscard]] Q_INVOKABLE QString getBucketName() const;
     [[nodiscard]] Q_INVOKABLE QString getSourceId() const;
+    [[nodiscard]] Q_INVOKABLE QString getObjectName(int index) const;
+    [[nodiscard]] Q_INVOKABLE QVariantMap get(int index) const;
 
     Q_INVOKABLE void setObjects(const QList<OneObject> &objects);
     Q_INVOKABLE void update();
