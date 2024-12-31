@@ -11,6 +11,7 @@
 
 #include "group_info.hpp"
 #include "user_info.hpp"
+#include "types/object_model.hpp"
 #include "types/response.hpp"
 #include "types/result.hpp"
 #include "types/storage_source.hpp"
@@ -52,6 +53,8 @@ public:
     void removeMember(const QString& memberId);
 
     QList<GroupInfo> allGroupInfo();
+
+    QList<OneObject> getObjects(const std::string& bucketName, const std::string& sourceId);
 
 signals:
     void requestFailed(const QString &error);

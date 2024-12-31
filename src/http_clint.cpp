@@ -650,6 +650,63 @@ QList<GroupInfo> HttpClient::allGroupInfo() {
     }
 }
 
+/// <summary>
+/// <code>
+/// curl --location --request GET 'http://localhost:10492/api/object/list'
+/// --header 'Content-Type: application/json'
+/// --data-raw '{
+///     "user_id": "6772b2141193cedbb302d3d2",
+///     "bucket_name": "another-bucket",
+///     "source_id": "6772b3a31193cedbb302d46f"
+/// }'
+/// </code>
+/// </summary>
+QList<OneObject> HttpClient::getObjects(const std::string &bucketName, const std::string &sourceId) {
+    qDebug() << "HttpClient::getObjects";
+    qDebug() << "HttpClient::getObjects bucketName: " << QString::fromStdString(bucketName);
+    qDebug() << "HttpClient::getObjects sourceId: " << QString::fromStdString(sourceId);
+    try {
+        web::json::value requestData;
+        requestData[_XPLATSTR("user_id")] = web::json::value::string(
+            UserManager::getInstance()->getId().toStdString());
+        requestData[_XPLATSTR("bucket_name")] = web::json::value::string(bucketName);
+        requestData[_XPLATSTR("source_id")] = web::json::value::string(sourceId);
+
+        web::http::http_request request(web::http::methods::GET);
+        request.set_request_uri(_XPLATSTR("/object/list"));
+        request.headers().set_content_type(_XPLATSTR("application/json"));
+        request.set_body(requestData);
+        const auto response = client.request(request).get();
+        const auto responseData = response.extract_json().get();
+        const auto &responseCode = responseData.at(_XPLATSTR("code")).as_number().to_int32();
+        const auto &responseMessage = responseData.at(_XPLATSTR("message")).as_string();
+        const auto &responseResult = responseData.at(_XPLATSTR("result")).as_string();
+        if (responseCode != 200) {
+            qDebug() << "HttpClient::getObjects error " << responseCode;
+            qDebug() << "HttpClient::getObjects error " << responseMessage;
+            qDebug() << "HttpClient::getObjects error " << responseResult;
+            return {};
+        }
+
+        const auto& resultData = responseData.at(_XPLATSTR("data")).as_array();
+        QList<OneObject> objects;
+        for (const auto& data : resultData) {
+            OneObject object{};
+            object.name = QString::fromStdString(data.at(_XPLATSTR("name")).as_string());
+            object.size = data.at(_XPLATSTR("size")).as_number().to_int32();
+            object.etag = QString::fromStdString(data.at(_XPLATSTR("etag")).as_string());
+            object.lastModified = QString::fromStdString(data.at(_XPLATSTR("last_modified")).as_string());
+            object.versionId = QString::fromStdString(data.at(_XPLATSTR("version_id")).as_string());
+            objects.append(object);
+        }
+        return objects;
+    }catch (const std::exception &e) {
+        qDebug() << "HttpClient::getObjects exception: " << e.what();
+        emit requestFailed(QString{e.what()});
+        return {};
+    }
+}
+
 
 HttpClient::HttpClient()
     : baseUrl("http://localhost:10492/api"), client(_XPLATSTR(baseUrl)) {

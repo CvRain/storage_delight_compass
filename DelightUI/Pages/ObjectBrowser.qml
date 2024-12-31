@@ -8,6 +8,8 @@ import "../Components"
 Rectangle {
     property Alert alertInstance
     property int selectGroup
+    property string currentBucketName: ""
+    property string currentSourceId: ""
 
     id: root
 
@@ -40,7 +42,7 @@ Rectangle {
         }
 
         Text {
-            id: membersInfoText
+            id: pageTitleText
             text: qsTr("Object ")
             color: "black"
             font.pixelSize: 22
@@ -153,12 +155,28 @@ Rectangle {
         BucketPage {
             bucketIndex: selectGroup
             groupModel: groupListModel
+
+            onBucketSelected: function(bucketName, sourceId){
+                currentBucketName = bucketName
+                currentSourceId = sourceId
+                console.debug("push objcetPage")
+                console.debug("bucketName ", bucketName)
+                console.debug("sourceId ", sourceId)
+
+
+                var newObjectPage = objectPage.createObject(stackView)
+                newObjectPage.initialized(bucketName, sourceId)
+                stackView.push(newObjectPage)
+            }
         }
     }
 
     Component {
         id: objectPage
-        ObjectPage {}
+        ObjectPage {
+            bucketName: currentBucketName
+            sourceId: currentSourceId
+        }
     }
 
     StackView {

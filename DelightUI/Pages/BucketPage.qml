@@ -85,8 +85,8 @@ Item{
                         anchors.fill: parent
 
                         onDoubleClicked: {
-                            bucketSelected(bucketNameText.text, sourceIdText.text)
                             console.debug("selected: ", bucketNameText.text, "-", sourceIdText.text)
+                            bucketSelected(bucketNameText.text, sourceIdText.text)
                         }
                     }
                 }

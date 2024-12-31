@@ -11,7 +11,10 @@
 #include "utils.hpp"
 #include "types/group_list_model.hpp"
 #include "types/group_model.hpp"
+#include "types/object_model.hpp"
 #include "types/storage_source.hpp"
+
+class ObjectModel;
 
 int main(int argc, char *argv[]) {
 
@@ -43,6 +46,8 @@ int main(int argc, char *argv[]) {
     qmlRegisterType<Utils>("Storage.Model", 1, 0, "Utils");
     qmlRegisterType<Bucket>("Storage.Model", 1, 0, "Bucket");
     qmlRegisterType<BucketListModel>("Storage.Model", 1, 0, "BucketListModel");
+    qmlRegisterType<OneObject>("Storage.Model", 1, 0, "OneObject");
+    qmlRegisterType<ObjectModel>("Storage.Model", 1, 0, "ObjectModel");
 
     engine.load("qrc:/qt/qml/storage_delight_compass/DelightUI/App.qml");
 
