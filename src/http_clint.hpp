@@ -70,6 +70,8 @@ public:
 
     Q_INVOKABLE void removeBucket(const QString& bucketName, const QString& sourceId);
 
+    Q_INVOKABLE bool isAdmin(const QString& userId);
+
 signals:
     void requestFailed(const QString &error);
 

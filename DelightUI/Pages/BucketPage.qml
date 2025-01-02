@@ -45,8 +45,8 @@ Item{
             height: buttonGroups.height
 
             onClicked: function(){
-                if(groupModel.isOwner(selectGroupIndex) === false){
-                    alertInstance.text = qsTr("You are not group owner")
+                if(HttpClient.isAdmin(UserManager.getId()) === false){
+                    alertInstance.text = qsTr("You are not admin")
                     alertInstance.level = "warn"
                     alertInstance.show()
                     return
@@ -73,8 +73,8 @@ Item{
             height: buttonGroups.height
 
             onClicked: function(){
-                if(groupModel.isOwner(selectGroupIndex) === false){
-                    alertInstance.text = qsTr("You are not group owner")
+                if(HttpClient.isAdmin(UserManager.getId()) === false){
+                    alertInstance.text = qsTr("You are not admin")
                     alertInstance.level = "warn"
                     alertInstance.show()
                     return

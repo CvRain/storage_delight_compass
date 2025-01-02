@@ -60,8 +60,11 @@ void HttpClient::login(const QString &userName, const QString &password) {
             UserManager::getInstance()->getUserInfo().setToken(responseToken.data());
             UserManager::getInstance()->getUserInfo().setName(responseName.data());
             UserManager::getInstance()->getUserInfo().setId(responseUserId.data());
+            emit userLogged(responseCode, QString{responseResult.data()}, QString{responseMessage.data()});
+            return;
         }
-        emit userLogged(responseCode, QString{responseResult.data()}, QString{responseMessage.data()});
+        emit requestFailed(QString{responseMessage.data()});
+
     }
     catch (const std::exception &e) {
         emit requestFailed(QString{e.what()});
@@ -1038,6 +1041,45 @@ void HttpClient::removeBucket(const QString &bucketName, const QString &sourceId
     catch (const std::exception &e) {
         qDebug() << "HttpClient::addGroupBucket exception: " << e.what();
         emit requestFailed(QString::fromStdString(e.what()));
+    }
+}
+
+/// <summary>
+/// <code>
+/// curl --location --request GET 'http://localhost:10492/api/User/is_admin'
+/// --header 'Content-Type: application/json'
+/// --data-raw '{
+///     "user_id": ""
+/// }'
+/// </code>
+/// </summary>
+bool HttpClient::isAdmin(const QString &userId) {
+    qDebug() << "HttpClient::isAdmin";
+    try {
+        web::http::http_request request(web::http::methods::GET);
+        request.set_request_uri(_XPLATSTR("/user/is_admin"));
+        request.headers().set_content_type(_XPLATSTR("application/json"));
+        web::json::value json;
+        json[_XPLATSTR("user_id")] = web::json::value::string(_XPLATSTR(userId.toStdString()));
+        request.set_body(json);
+        const auto requestTask = client.request(request).then([&](const web::http::http_response &response) {
+            if (response.status_code() != web::http::status_codes::OK) {
+                qDebug() << "HttpClient::isAdmin error:" << response.status_code();
+                emit requestFailed(QString::fromStdString(response.extract_string().get()));
+            }
+            const auto responseData = response.extract_json().get();
+            if (const auto &responseCode = responseData.at(_XPLATSTR("code")).as_number().to_int32();
+                responseCode == 200) {
+                return true;
+            }
+            return false;
+        });
+        return requestTask.get();
+    }
+    catch (const std::exception &e) {
+        qDebug() << "HttpClient::isAdmin exception: " << e.what();
+        emit requestFailed(QString::fromStdString(e.what()));
+        return false;
     }
 }
 
