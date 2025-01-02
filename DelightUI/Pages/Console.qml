@@ -25,9 +25,10 @@ Item {
             id: topbarMenu
             anchors.left: bar.left
             anchors.top: bar.top
+            anchors.verticalCenter: parent.verticalCenter
             spacing: 5
             width: parent.width - storageName
-            height: parent.height
+            height: parent.height - 5
 
             FlatComboBox {
                 id: combox
@@ -107,6 +108,8 @@ Item {
             }
         }
 
+
+
         Text {
             id: storageName
             font.pixelSize: 16
@@ -118,7 +121,19 @@ Item {
             horizontalAlignment: Text.AlignRight
             anchors.right: parent.right
             anchors.rightMargin: 25
-            anchors.verticalCenter: parent.verticalCente
+            anchors.verticalCenter: parent.verticalCenter
+
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    let storageId = sourceList.getId(combox.currentIndex);
+                    utils.copyToClipboard(storageId)
+                    alertInstance.text = "copy success: " + storageId
+                    alertInstance.level = "success"
+                    alertInstance.show()
+                }
+
+            }
         }
     }
 
@@ -247,5 +262,9 @@ Item {
             webview.url = sourceList.getUrl(0)
             storageName.text = sourceList.getUrl(0)
         }
+    }
+
+    Utils{
+        id: utils
     }
 }

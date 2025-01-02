@@ -230,7 +230,7 @@ Item {
         }
 
         onRejected: {
-            console.debug("用户取消了文件选择")
+            console.debug("user cancel")
         }
     }
 

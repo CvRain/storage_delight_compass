@@ -43,7 +43,7 @@ Rectangle {
             id: column
             width: parent.width
             height: parent.height - userName - logout
-            anchors.fill: sidebarBackground
+            anchors.fill: sideBar
             spacing: 0
 
             // Add multiple SideButtons here

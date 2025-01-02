@@ -10,8 +10,10 @@ Rectangle {
     property int selectGroup
     property string currentBucketName: ""
     property string currentSourceId: ""
+    property string currentGroupId: ""
 
     id: root
+    anchors.fill: parent
 
     Row {
         id: topBarLeft
@@ -85,6 +87,9 @@ Rectangle {
 
                 onCurrentIndexChanged: {
                     selectGroup = currentIndex
+                    let groupId = firstPageListView.model.get(firstPageListView.currentIndex).id
+                    console.debug("groupId: ", groupId)
+                    currentGroupId = groupId
                 }
             }
 
@@ -171,8 +176,11 @@ Rectangle {
     Component {
         id: bucketPage
         BucketPage {
+            width: stackView.width
+            height: stackView.height
             bucketIndex: selectGroup
             groupModel: groupListModel
+            groupId: currentGroupId
 
             onBucketSelected: function (bucketName, sourceId) {
                 currentBucketName = bucketName
@@ -206,5 +214,7 @@ Rectangle {
         anchors.top: topLine.bottom
         anchors.horizontalCenter: topLine.horizontalCenter
         anchors.topMargin: 10
+
+
     }
 }

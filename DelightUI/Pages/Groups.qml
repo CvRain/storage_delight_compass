@@ -38,7 +38,7 @@ Rectangle {
         height: 50
         spacing: 5
 
-        anchors.top: parent.top
+        anchors.top: topBarLeft.top
         anchors.right: topLine.right
 
         BaseButton {

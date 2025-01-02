@@ -62,6 +62,14 @@ public:
 
     Q_INVOKABLE void objectRemove(const QString &objectName, const QString &bucketName, const QString &sourceId);
 
+    Q_INVOKABLE void addGroupBucket(const QString& bucketName, const QString& sourceId, const QString& groupId);
+
+    Q_INVOKABLE void removeGroupBucket(const QString& bucketName, const QString& sourceId, const QString& groupId);
+
+    Q_INVOKABLE void addBucket(const QString& bucketName, const QString& sourceId);
+
+    Q_INVOKABLE void removeBucket(const QString& bucketName, const QString& sourceId);
+
 signals:
     void requestFailed(const QString &error);
 

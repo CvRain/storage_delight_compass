@@ -48,7 +48,7 @@ QModelIndex GroupListModel::index(const int row, const int column, const QModelI
 
 QVariantMap GroupListModel::get(const int index) const {
     if (index < 0 || index >= groupList.size()) {
-        return QVariantMap();
+        return {};
     }
     return QVariantMap{
         {"id", groupList.at(index).getId()},

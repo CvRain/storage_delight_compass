@@ -36,12 +36,17 @@ QString StorageSourceModel::getName(const int index) const {
     return sources.at(index).getName();
 }
 
+QString StorageSourceModel::getId(const int index) const {
+    return sources.at(index).getId();
+}
+
 int StorageSourceModel::size() const {
-    return sources.size();
+    return static_cast<int>(sources.size());
 }
 
 void StorageSourceModel::update() {
     qDebug() << "StorageSourceModel::update";
+
     this->sources = HttpClient::getInstance()->storageSource();
     currentIndex = 0;
 }

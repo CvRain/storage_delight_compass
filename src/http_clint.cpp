@@ -7,6 +7,12 @@
 #include <QDebug>
 #include <QFile>
 #include <filesystem>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QHttpMultiPart>
+#include <QUrl>
+#include <QFileInfo>
+
 #include "types/storage_source.hpp"
 #include <cpprest/filestream.h>
 #include <cpprest/json.h>
@@ -783,80 +789,72 @@ void HttpClient::objectDownload(const QString &objectName, const QString &bucket
 /// </summary>
 void HttpClient::objectUpload(const QString &filePath, const QString &bucketName, const QString &sourceId) {
     qDebug() << "HttpClient::objectUpload";
+
     try {
-        std::stringstream ss;
-        ss << "----WebKitFormBoundary" << std::hex << std::time(nullptr);
-        std::string boundary = ss.str();
+        auto *manager = new QNetworkAccessManager();
 
-        web::http::http_request request(web::http::methods::POST);
-        request.set_request_uri(_XPLATSTR("/object/upload"));
-        request.headers().set_content_type(_XPLATSTR("multipart/form-data; boundary=") + _XPLATSTR(boundary));
+        const QUrl url(QString("http://localhost:10492/api/object/upload"));
+        const QNetworkRequest request(url);
 
-        std::stringstream body;
-        body << "--" << boundary << std::endl;
-        body << "Content-Disposition: form-data; name=\"source_id\"" << std::endl << std::endl;
-        //body << sourceId.toStdString() << std::endl;
-        body << "6772b3a31193cedbb302d46f" << std::endl;
+        auto *multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 
-        body << "--" << boundary << std::endl;
-        body << "Content-Disposition: form-data; name=\"user_id\"" << std::endl << std::endl;
-        //body << UserManager::getInstance()->getId().toStdString() << std::endl;
-        body << "6772b2141193cedbb302d3d2" << std::endl;
+        QHttpPart sourceIdPart;
+        sourceIdPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"source_id\""));
+        sourceIdPart.setBody(sourceId.toUtf8());
+        multipart->append(sourceIdPart);
 
-        body << "--" << boundary << std::endl;
-        body << "Content-Disposition: form-data; name=\"bucket_name\"" << std::endl << std::endl;
-        //body << bucketName.toStdString() << std::endl;
-        body << "another-bucket" << std::endl;
+        QHttpPart userIdPart;
+        userIdPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"user_id\""));
+        userIdPart.setBody(UserManager::getInstance()->getId().toUtf8());
+        multipart->append(userIdPart);
 
-        //检查filePath前面是否存在"file://"开头，如果存在则删除
-        auto path = filePath.toStdString();
-        if (path.find("file://") == 0) {
-            path.erase(0, 7);
+        QHttpPart bucketNamePart;
+        bucketNamePart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                                 QVariant("form-data; name=\"bucket_name\""));
+        bucketNamePart.setBody(bucketName.toUtf8());
+        multipart->append(bucketNamePart);
+
+        //检查filePath开头是否存在file://如果有则删除
+        auto path = filePath;
+        if (filePath.startsWith("file://")) {
+            path = filePath.mid(7);
         }
-        qDebug() << "HttpClient::objectUpload path:" << path.data();
-
-        body << "--" << boundary << std::endl;
-        body << "Content-Disposition: form-data; name=\"files\"; filename=\"" << path << "\"" << std::endl;
-        body << "Content-Type: application/octet-stream" << std::endl << std::endl;
-
-        if (QFile file(path.data()); file.open(QIODevice::ReadOnly)) {
-            QByteArray data = file.readAll();
-            body << data.toStdString();
-            file.close();
-        }
-        else {
-            qDebug() << "HttpClient::objectUpload file not found:" << path.data();
-            emit requestFailed(QString::fromStdString(path + " not found"));
+        const auto file = new QFile(path);
+        if (!file->open(QIODevice::ReadOnly)) {
+            qDebug() << "HttpClient::objectUpload file open failed";
+            emit requestFailed("File open failed");
             return;
         }
 
-        body << "--" << boundary << "--" << std::endl;
+        QHttpPart filePart;
+        const auto fileName = QFileInfo(*file).fileName();
+        filePart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                           QVariant("form-data; name=\"files\"; filename=\"" + fileName + "\""));
+        filePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/octet-stream"));
+        //filePart.setBody(file->readAll());
+        filePart.setBodyDevice(file);
+        file->setParent(multipart);
 
-        request.set_body(body.str());
-        const auto requestTask = client.request(request).then([&](const web::http::http_response &response) {
-            if (response.status_code() != web::http::status_codes::OK) {
-                qDebug() << "HttpClient::objectUpload error:" << response.status_code();
-                emit requestFailed(QString::fromStdString(response.extract_string().get()));
+        multipart->append(filePart);
+
+        QNetworkReply *reply = manager->post(request, multipart);
+        connect(reply, &QNetworkReply::finished, [=]() {
+            if (reply->error() == QNetworkReply::NoError) {
+                emit objectUploadFinish();
             }
-            const auto responseData = response.extract_json().get();
-            const auto &responseCode = responseData.at(_XPLATSTR("code")).as_number().to_int32();
-            const auto &responseMessage = responseData.at(_XPLATSTR("message")).as_string();
-            const auto &responseResult = responseData.at(_XPLATSTR("result")).as_string();
-            if (responseCode != 200) {
-                qDebug() << "HttpClient::getObjects error " << responseCode;
-                qDebug() << "HttpClient::getObjects error " << responseMessage;
-                qDebug() << "HttpClient::getObjects error " << responseResult;
-                emit requestFailed(QString::fromStdString(responseResult));
-                return;
+            else {
+                qDebug() << "HttpClient::objectUpload error: " << reply->errorString();
+                emit requestFailed(reply->errorString());
             }
-            emit objectUploadFinish();
+            reply->deleteLater();
+            multipart->deleteLater();
         });
-        requestTask.get();
     }
     catch (const std::exception &e) {
         qDebug() << "HttpClient::objectUpload exception: " << e.what();
     }
 }
+
 
 /// <summary>
 /// <code>
@@ -878,8 +876,9 @@ void HttpClient::objectRemove(const QString &objectName, const QString &bucketNa
         request.headers().set_content_type(_XPLATSTR("application/json"));
 
         web::json::value json;
-        json[_XPLATSTR("user_id")] = web::json::value::string(_XPLATSTR(UserManager::getInstance()->getId().toStdString()));
-        json[_XPLATSTR("source_id")] =web::json::value::string(_XPLATSTR(sourceId.toStdString()));
+        json[_XPLATSTR("user_id")] = web::json::value::string(
+            _XPLATSTR(UserManager::getInstance()->getId().toStdString()));
+        json[_XPLATSTR("source_id")] = web::json::value::string(_XPLATSTR(sourceId.toStdString()));
         json[_XPLATSTR("bucket_name")] = web::json::value::string(_XPLATSTR(bucketName.toStdString()));
         json[_XPLATSTR("object_name")] = web::json::value::string(_XPLATSTR(objectName.toStdString()));
         request.set_body(json);
@@ -901,8 +900,143 @@ void HttpClient::objectRemove(const QString &objectName, const QString &bucketNa
             }
             emit objectRemoveFinish();
         });
-    }catch (const std::exception &e) {
+    }
+    catch (const std::exception &e) {
         qDebug() << "HttpClient::objectRemove exception: " << e.what();
+        emit requestFailed(QString::fromStdString(e.what()));
+    }
+}
+
+/// <summary>
+/// curl --location --request PATCH 'http://localhost:10492/api/Group/buckets/add' \
+/// --header 'Content-Type: application/json' \
+/// --data-raw '{
+///     "user_id": "string",
+///     "group_id": "string",
+///     "source_id": "string",
+///     "bucket_name": "string"
+/// }'
+/// </summary>
+void HttpClient::addGroupBucket(const QString &bucketName, const QString &sourceId, const QString &groupId) {
+    qDebug() << "HttpClient::addGroupBucket";
+    qDebug() << "HttpClient::addGroupBucket bucketName:" << bucketName;
+    qDebug() << "HttpClient::addGroupBucket sourceId:" << sourceId;
+    qDebug() << "HttpClient::addGroupBucket groupId:" << groupId;
+
+    try {
+        web::http::http_request request(web::http::methods::PATCH);
+        request.set_request_uri(_XPLATSTR("/group/buckets/add"));
+        request.headers().set_content_type(_XPLATSTR("application/json"));
+        web::json::value json;
+        json[_XPLATSTR("user_id")] = web::json::value::string(
+            _XPLATSTR(UserManager::getInstance()->getId().toStdString()));
+        json[_XPLATSTR("group_id")] = web::json::value::string(groupId.toStdString());
+        json[_XPLATSTR("source_id")] = web::json::value::string(_XPLATSTR(sourceId.toStdString()));
+        json[_XPLATSTR("bucket_name")] = web::json::value::string(_XPLATSTR(bucketName.toStdString()));
+        request.set_body(json);
+        const auto requestTask = client.request(request).then([&](const web::http::http_response &response) {
+            if (response.status_code() != web::http::status_codes::OK) {
+                qDebug() << "HttpClient::addBucket error:" << response.status_code();
+                emit requestFailed(QString::fromStdString(response.extract_string().get()));
+            }
+            const auto responseData = response.extract_json().get();
+            const auto &responseCode = responseData.at(_XPLATSTR("code")).as_number().to_int32();
+            const auto &responseMessage = responseData.at(_XPLATSTR("message")).as_string();
+            const auto &responseResult = responseData.at(_XPLATSTR("result")).as_string();
+            if (responseCode != 200) {
+                qDebug() << "HttpClient::addBucket error " << responseCode;
+                qDebug() << "HttpClient::addBucket error " << responseMessage;
+                qDebug() << "HttpClient::addBucket error " << responseResult;
+                emit requestFailed(QString::fromStdString(responseResult));
+                return;
+            }
+            emit requestFinish(responseCode, QString::fromStdString(responseResult),
+                               QString::fromStdString(responseMessage));
+        });
+        requestTask.get();
+    }
+    catch (const std::exception &e) {
+        qDebug() << "HttpClient::addGroupBucket exception: " << e.what();
+        emit requestFailed(QString::fromStdString(e.what()));
+    }
+}
+
+/// <summary>
+/// curl --location --request DELETE 'http://localhost:10492/api/Group/buckets/remove'
+/// --header 'Content-Type: application/json'
+/// --data-raw '{
+///     "user_id": "67459983948109dbd1079573",
+///     "group_id": "67459983948109dbd1079575",
+///     "source_id": "673ea940b4f544a2c2092b3d",
+///     "bucket_name": "another-bucket"
+/// }'
+/// </summary>
+void HttpClient::removeGroupBucket(const QString &bucketName, const QString &sourceId, const QString &groupId) {
+    qDebug() << "HttpClient::removeGroupBucket";
+    qDebug() << "HttpClient::removeGroupBucket bucketName:" << bucketName;
+    qDebug() << "HttpClient::removeGroupBucket sourceId:" << sourceId;
+    qDebug() << "HttpClient::removeGroupBucket groupId:" << groupId;
+    if (bucketName.isEmpty() || sourceId.isEmpty() || groupId.isEmpty()) {
+        emit requestFailed(
+            QString("HttpClient::removeGroupBucket error: bucketName, sourceId, groupId cannot be empty"));
+        return;
+    }
+
+    try {
+        web::http::http_request request(web::http::methods::DEL);
+        request.set_request_uri(_XPLATSTR("/group/buckets/remove"));
+        request.headers().set_content_type(_XPLATSTR("application/json"));
+
+        web::json::value json;
+        json[_XPLATSTR("user_id")] = web::json::value::string(
+            _XPLATSTR(UserManager::getInstance()->getId().toStdString()));
+        json[_XPLATSTR("group_id")] = web::json::value::string(_XPLATSTR(groupId.toStdString()));
+        json[_XPLATSTR("source_id")] = web::json::value::string(_XPLATSTR(sourceId.toStdString()));
+        json[_XPLATSTR("bucket_name")] = web::json::value::string(_XPLATSTR(bucketName.toStdString()));
+        request.set_body(json);
+
+        const auto requestTask = client.request(request).then([&](const web::http::http_response &response) {
+            if (response.status_code() != web::http::status_codes::OK) {
+                qDebug() << "HttpClient::removeGroupBucket error:" << response.status_code();
+                emit requestFailed(QString::fromStdString(response.extract_string().get()));
+            }
+            const auto responseData = response.extract_json().get();
+            const auto &responseCode = responseData.at(_XPLATSTR("code")).as_number().to_int32();
+            const auto &responseMessage = responseData.at(_XPLATSTR("message")).as_string();
+            const auto &responseResult = responseData.at(_XPLATSTR("result")).as_string();
+            if (responseCode != 200) {
+                qDebug() << "HttpClient::removeGroupBucket error " << responseCode;
+                qDebug() << "HttpClient::removeGroupBucket error " << responseMessage;
+                qDebug() << "HttpClient::removeGroupBucket error " << responseResult;
+                emit requestFailed(QString::fromStdString(responseResult));
+                return;
+            }
+            emit requestFinish(responseCode, QString::fromStdString(responseResult),
+                               QString::fromStdString(responseMessage));
+        });
+        requestTask.get();
+    }
+    catch (const std::exception &e) {
+        qDebug() << "HttpClient::addGroupBucket exception: " << e.what();
+        emit requestFailed(QString::fromStdString(e.what()));
+    }
+}
+
+
+void HttpClient::addBucket(const QString &bucketName, const QString &sourceId) {
+    try {
+    }
+    catch (const std::exception &e) {
+        qDebug() << "HttpClient::addGroupBucket exception: " << e.what();
+        emit requestFailed(QString::fromStdString(e.what()));
+    }
+}
+
+void HttpClient::removeBucket(const QString &bucketName, const QString &sourceId) {
+    try {
+    }
+    catch (const std::exception &e) {
+        qDebug() << "HttpClient::addGroupBucket exception: " << e.what();
         emit requestFailed(QString::fromStdString(e.what()));
     }
 }
