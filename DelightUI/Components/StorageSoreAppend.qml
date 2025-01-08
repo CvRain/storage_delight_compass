@@ -54,6 +54,7 @@ Dialog {
     standardButtons: Dialog.Ok | Dialog.Cancel
 
     onAccepted: {
+
         // var params = Qt.createQmlObject('import "." MyParams {};', root)
         // params.url = urlInput.text
         // params.name = nameInput.text

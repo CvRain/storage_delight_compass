@@ -221,7 +221,7 @@ CommonResponse HttpClient::addStorageSource(const StorageSource &source) {
     requestData[_XPLATSTR("access_key")] = web::json::value::string(source.getAk().toStdString());
     requestData[_XPLATSTR("secret_key")] = web::json::value::string(source.getSk().toStdString());
     requestData[_XPLATSTR("user_id")] = web::json::value::string(UserManager::getInstance()->getId().toStdString());
-    requestData[_XPLATSTR("is_https")] = web::json::value::boolean(source.getIsHttps());
+    requestData[_XPLATSTR("is_https")] = web::json::value::boolean(false);
 
     web::http::http_request request(web::http::methods::PUT);
     request.set_request_uri(_XPLATSTR("/StorageSource/add"));

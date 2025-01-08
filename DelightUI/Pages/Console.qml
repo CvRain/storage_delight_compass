@@ -108,8 +108,6 @@ Item {
             }
         }
 
-
-
         Text {
             id: storageName
             font.pixelSize: 16
@@ -123,16 +121,15 @@ Item {
             anchors.rightMargin: 25
             anchors.verticalCenter: parent.verticalCenter
 
-            MouseArea{
+            MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    let storageId = sourceList.getId(combox.currentIndex);
+                    let storageId = sourceList.getId(combox.currentIndex)
                     utils.copyToClipboard(storageId)
                     alertInstance.text = "copy success: " + storageId
                     alertInstance.level = "success"
                     alertInstance.show()
                 }
-
             }
         }
     }
@@ -147,7 +144,7 @@ Item {
                 var sourceData = {
                     "ak": akText,
                     "sk": skText,
-                    "isHttps": isHttp,
+                    "isHttps": false,
                     "url": urlText,
                     "name": nameText
                 }
@@ -189,7 +186,6 @@ Item {
                 var customSavePath = StandardPaths.writableLocation(
                             StandardPaths.DownloadLocation).toString().replace(
                             "file:///", "")
-                ;
                 savePath = customSavePath
                 console.log("Custom save path: ", customSavePath)
                 console.log("downloadDirectory path: ",
@@ -208,7 +204,6 @@ Item {
                 } else if (downloadItem.state === WebEngineDownloadRequest.DownloadCancelled) {
                     console.log("下载失败")
                 }
-
             }
         }
     }
@@ -239,7 +234,7 @@ Item {
 
         onRequestFailed: {
             alertInstance.text = error
-            alertInstance.left = "error"
+            alertInstance.level = "error"
             alertInstance.show()
         }
     }
@@ -264,7 +259,7 @@ Item {
         }
     }
 
-    Utils{
+    Utils {
         id: utils
     }
 }
